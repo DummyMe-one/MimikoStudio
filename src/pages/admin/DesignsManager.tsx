@@ -2,6 +2,9 @@ import { useState, useEffect, useRef } from 'react';
 import { Plus, Edit2, Trash2, X, Upload } from 'lucide-react';
 import { designsApi, collectionsApi, uploadApi } from '../../services/api';
 import { isSupabaseConfigured } from '../../lib/supabase';
+import { PermissionGuard } from '../../components/PermissionGuard';
+import { PERMISSIONS } from '../../lib/permissions';
+import { useAuth } from '../../contexts/AuthContext';
 
 interface DesignForm {
   name: string; slug: string; description: string; longDescription: string;
@@ -21,6 +24,7 @@ const emptyForm: DesignForm = {
 };
 
 export default function DesignsManager() {
+  const { hasPermission } = useAuth();
   const [designs, setDesigns] = useState<any[]>([]);
   const [collections, setCollections] = useState<any[]>([]);
   const [showForm, setShowForm] = useState(false);
@@ -153,16 +157,19 @@ export default function DesignsManager() {
   if (loading) return <div className="py-20 text-center text-taupe">Loading designs...</div>;
 
   return (
+    <PermissionGuard permission={PERMISSIONS.DESIGNS_VIEW}>
     <div>
       <div className="flex items-center justify-between mb-6">
         <div>
           <h1 className="heading-serif text-3xl font-semibold text-espresso">Designs</h1>
           <p className="text-taupe text-sm">{designs.length} designs in your catalog</p>
         </div>
-        <button onClick={() => setShowForm(true)}
-          className="flex items-center gap-2 bg-espresso text-ivory px-4 py-2.5 text-sm font-sans font-medium hover:bg-espresso/90 transition-colors">
-          <Plus size={16} /> Add Design
-        </button>
+        {hasPermission(PERMISSIONS.DESIGNS_CREATE) && (
+          <button onClick={() => setShowForm(true)}
+            className="flex items-center gap-2 bg-espresso text-ivory px-4 py-2.5 text-sm font-sans font-medium hover:bg-espresso/90 transition-colors">
+            <Plus size={16} /> Add Design
+          </button>
+        )}
       </div>
 
       {!isSupabaseConfigured() && (
@@ -220,12 +227,16 @@ export default function DesignsManager() {
                       </span>
                     </td>
                     <td className="px-4 py-3 text-right">
-                      <button onClick={() => handleEdit(design)} className="p-2 text-taupe hover:text-espresso transition-colors" title="Edit">
-                        <Edit2 size={16} />
-                      </button>
-                      <button onClick={() => handleDelete(design.id)} className="p-2 text-taupe hover:text-red-600 transition-colors" title="Delete">
-                        <Trash2 size={16} />
-                      </button>
+                      {hasPermission(PERMISSIONS.DESIGNS_EDIT) && (
+                        <button onClick={() => handleEdit(design)} className="p-2 text-taupe hover:text-espresso transition-colors" title="Edit">
+                          <Edit2 size={16} />
+                        </button>
+                      )}
+                      {hasPermission(PERMISSIONS.DESIGNS_DELETE) && (
+                        <button onClick={() => handleDelete(design.id)} className="p-2 text-taupe hover:text-red-600 transition-colors" title="Delete">
+                          <Trash2 size={16} />
+                        </button>
+                      )}
                     </td>
                   </tr>
                 );
@@ -396,5 +407,6 @@ export default function DesignsManager() {
         </div>
       )}
     </div>
+    </PermissionGuard>
   );
 }
