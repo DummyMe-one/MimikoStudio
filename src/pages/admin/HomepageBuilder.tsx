@@ -35,13 +35,36 @@ export default function HomepageBuilder() {
   useEffect(() => { loadSections(); }, []);
 
   const loadSections = async () => {
+    // Try loading from localStorage first (works without database)
+    const saved = localStorage.getItem('mimiko_homepage_sections');
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        setSections(parsed);
+        setLoading(false);
+        return;
+      } catch (e) {
+        // Invalid JSON, continue to Supabase
+      }
+    }
+
+    // Try loading from Supabase
     const res = await homepageApi.getAllSections();
-    if (res.success) setSections(res.data || []);
+    if (res.success && res.data) {
+      setSections(res.data);
+      // Cache to localStorage
+      localStorage.setItem('mimiko_homepage_sections', JSON.stringify(res.data));
+    }
     setLoading(false);
+  };
+
+  const saveToLocalStorage = (newSections: any[]) => {
+    localStorage.setItem('mimiko_homepage_sections', JSON.stringify(newSections));
   };
 
   const addSection = async (type: string) => {
     const newSection = {
+      id: `local_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
       homepage_id: '00000000-0000-0000-0000-000000000002',
       type,
       enabled: true,
@@ -49,22 +72,46 @@ export default function HomepageBuilder() {
       theme: type === 'dark_showcase' || type === 'cta' ? 'dark' : 'light',
       config: DEFAULT_CONFIGS[type] || {},
     };
+    
+    // Save to localStorage immediately
+    const updatedSections = [...sections, newSection];
+    saveToLocalStorage(updatedSections);
+    setSections(updatedSections);
+    
+    // Try to save to Supabase (optional)
     const res = await homepageApi.createSection(newSection);
-    if (res.success) {
-      await loadSections();
-      setShowAddMenu(false);
+    if (res.success && res.data) {
+      // Replace local ID with database ID
+      const finalSections = updatedSections.map(s => 
+        s.id === newSection.id ? res.data : s
+      );
+      saveToLocalStorage(finalSections);
+      setSections(finalSections);
     }
+    
+    setShowAddMenu(false);
   };
 
   const deleteSection = async (id: string) => {
     if (!confirm('Delete this section?')) return;
+    
+    // Update localStorage immediately
+    const updatedSections = sections.filter(s => s.id !== id);
+    saveToLocalStorage(updatedSections);
+    setSections(updatedSections);
+    
+    // Try to delete from Supabase (optional)
     await homepageApi.deleteSection(id);
-    await loadSections();
   };
 
   const toggleEnabled = async (section: any) => {
-    await homepageApi.updateSection(section.id, { enabled: !section.enabled });
-    await loadSections();
+    const updatedSection = { ...section, enabled: !section.enabled };
+    const updatedSections = sections.map(s => s.id === section.id ? updatedSection : s);
+    saveToLocalStorage(updatedSections);
+    setSections(updatedSections);
+    
+    // Try to update in Supabase (optional)
+    await homepageApi.updateSection(section.id, { enabled: updatedSection.enabled });
   };
 
   const moveSection = async (index: number, direction: 'up' | 'down') => {
@@ -72,9 +119,15 @@ export default function HomepageBuilder() {
     if (newIndex < 0 || newIndex >= sections.length) return;
     const newOrder = [...sections];
     [newOrder[index], newOrder[newIndex]] = [newOrder[newIndex], newOrder[index]];
-    const ids = newOrder.map(s => s.id);
+    
+    // Update sort_order
+    const updatedSections = newOrder.map((s, i) => ({ ...s, sort_order: i + 1 }));
+    saveToLocalStorage(updatedSections);
+    setSections(updatedSections);
+    
+    // Try to reorder in Supabase (optional)
+    const ids = updatedSections.map(s => s.id);
     await homepageApi.reorderSections(ids);
-    await loadSections();
   };
 
   const startEdit = (section: any) => {
@@ -85,10 +138,19 @@ export default function HomepageBuilder() {
   const saveEdit = async () => {
     if (!editingId) return;
     setSaving(true);
+    
+    // Update localStorage immediately
+    const updatedSections = sections.map(s => 
+      s.id === editingId ? { ...s, config: editConfig } : s
+    );
+    saveToLocalStorage(updatedSections);
+    setSections(updatedSections);
+    
+    // Try to update in Supabase (optional)
     await homepageApi.updateSection(editingId, { config: editConfig });
+    
     setSaving(false);
     setEditingId(null);
-    await loadSections();
   };
 
   const updateConfigField = (path: string, value: any) => {
