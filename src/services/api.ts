@@ -12,18 +12,34 @@ export const designsApi = {
       .select('*, design_images(*)')
       .order('created_at', { ascending: false });
     if (error) return { success: false, error: error.message };
-    // Transform images to match frontend format
-    const transformed = data.map((d: any) => ({
-      ...d,
-      collectionId: d.collection_id,
-      priceType: d.price_type,
-      longDescription: d.long_description,
+    
+    // Transform all snake_case to camelCase
+    const transformed = (data || []).map((d: any) => ({
+      id: d.id,
+      name: d.name,
+      slug: d.slug,
+      description: d.description || '',
+      longDescription: d.long_description || '',
+      collectionId: d.collection_id || '',
+      category: d.category || '',
+      price: d.price || '',
+      priceType: d.price_type || 'starting',
+      availability: d.availability || 'made-to-order',
+      customizable: d.customizable ?? true,
+      featured: d.featured ?? false,
+      material: d.material || '',
+      craft: d.craft || '',
+      occasion: d.occasion || '',
+      care: d.care || '',
+      tags: d.tags || [],
       images: (d.design_images || []).map((img: any) => ({
         id: img.id,
         url: img.image_url,
-        alt: img.alt_text,
-        isPrimary: img.is_primary,
+        alt: img.alt_text || '',
+        isPrimary: img.is_primary ?? false,
       })).sort((a: any, b: any) => a.sort_order - b.sort_order),
+      createdAt: d.created_at,
+      updatedAt: d.updated_at,
     }));
     return { success: true, data: transformed };
   },
@@ -38,19 +54,35 @@ export const designsApi = {
       .eq('slug', slug)
       .single();
     if (error) return { success: false, error: error.message };
+    
     return {
       success: true,
       data: {
-        ...data,
-        collectionId: data.collection_id,
-        priceType: data.price_type,
-        longDescription: data.long_description,
+        id: data.id,
+        name: data.name,
+        slug: data.slug,
+        description: data.description || '',
+        longDescription: data.long_description || '',
+        collectionId: data.collection_id || '',
+        category: data.category || '',
+        price: data.price || '',
+        priceType: data.price_type || 'starting',
+        availability: data.availability || 'made-to-order',
+        customizable: data.customizable ?? true,
+        featured: data.featured ?? false,
+        material: data.material || '',
+        craft: data.craft || '',
+        occasion: data.occasion || '',
+        care: data.care || '',
+        tags: data.tags || [],
         images: (data.design_images || []).map((img: any) => ({
           id: img.id,
           url: img.image_url,
-          alt: img.alt_text,
-          isPrimary: img.is_primary,
+          alt: img.alt_text || '',
+          isPrimary: img.is_primary ?? false,
         })).sort((a: any, b: any) => a.sort_order - b.sort_order),
+        createdAt: data.created_at,
+        updatedAt: data.updated_at,
       },
     };
   },
@@ -162,7 +194,21 @@ export const collectionsApi = {
       .select('*')
       .order('sort_order');
     if (error) return { success: false, error: error.message };
-    return { success: true, data };
+    
+    // Transform snake_case to camelCase
+    const transformed = (data || []).map((col: any) => ({
+      id: col.id,
+      name: col.name,
+      slug: col.slug,
+      description: col.description || '',
+      coverImage: col.cover_image || '',
+      featured: col.featured ?? false,
+      sortOrder: col.sort_order || 0,
+      createdAt: col.created_at,
+      updatedAt: col.updated_at,
+    }));
+    
+    return { success: true, data: transformed };
   },
 
   async create(col: any) {
