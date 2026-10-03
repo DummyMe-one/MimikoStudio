@@ -6,7 +6,7 @@ export default function About() {
   return (
     <div>
       {/* Hero */}
-      <section className="relative py-24 lg:py-36 overflow-hidden">
+      <section className="relative py-28 lg:py-44 overflow-hidden">
         <div className="absolute inset-0">
           <img
             src="https://images.unsplash.com/photo-1573408301185-9146fe634ad0?w=1200&q=80"
@@ -14,16 +14,26 @@ export default function About() {
             className="w-full h-full object-cover"
             loading="lazy"
           />
-          <div className="absolute inset-0 bg-espresso/40" />
+          <div className="absolute inset-0 bg-gradient-to-b from-espresso/30 via-espresso/40 to-espresso/60" />
         </div>
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <ScrollReveal>
-            <p className="text-xs uppercase tracking-[0.3em] text-light-gold font-sans font-medium mb-4">
+            <div className="ornament-divider mb-8">
+              <div className="w-2 h-2 border border-light-gold/60 rotate-45"></div>
+            </div>
+            
+            <p className="section-label mb-6 text-light-gold/90">
               Our Story
             </p>
-            <h1 className="heading-serif text-4xl sm:text-5xl lg:text-6xl font-semibold text-ivory mb-4">
-              The Story Behind<br />Mimiko Studio
+            
+            <h1 className="display-serif text-5xl sm:text-6xl lg:text-7xl text-ivory leading-[1.05]">
+              The Story Behind<br />
+              <span className="italic">Mimiko Studio</span>
             </h1>
+            
+            <div className="ornament-divider mt-10">
+              <div className="w-2 h-2 border border-light-gold/60 rotate-45"></div>
+            </div>
           </ScrollReveal>
         </div>
       </section>
@@ -34,11 +44,12 @@ export default function About() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center">
             <ScrollReveal direction="left">
               <div>
-                <p className="text-xs uppercase tracking-[0.3em] text-light-gold font-sans font-medium mb-4">
+                <p className="section-label mb-4">
                   Our Story
                 </p>
-                <h2 className="heading-serif text-3xl lg:text-4xl font-semibold text-espresso mb-6">
-                  Born from a Love of Craft
+                <h2 className="display-serif text-4xl lg:text-5xl text-espresso mb-8 leading-[1.1]">
+                  Born from a Love<br />
+                  <span className="italic">of Craft</span>
                 </h2>
                 <div className="space-y-4 text-taupe leading-relaxed">
                   <p>
@@ -114,14 +125,20 @@ export default function About() {
       </section>
 
       {/* Our Philosophy */}
-      <section className="py-16 lg:py-24">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+      <section className="py-20 lg:py-32 relative">
+        <div className="absolute inset-0 bg-cream/30"></div>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative">
           <ScrollReveal>
-            <p className="text-xs uppercase tracking-[0.3em] text-light-gold font-sans font-medium mb-4">
+            <div className="ornament-divider mb-8">
+              <div className="w-2 h-2 border border-light-gold rotate-45"></div>
+            </div>
+            
+            <p className="section-label mb-6">
               Our Philosophy
             </p>
-            <h2 className="heading-serif text-3xl lg:text-5xl font-semibold text-espresso mb-8">
-              "Every piece should feel personal."
+            
+            <h2 className="display-serif text-4xl lg:text-6xl text-espresso mb-8 leading-[1.1]">
+              <span className="italic">"Every piece should feel personal."</span>
             </h2>
             <p className="text-taupe max-w-2xl mx-auto leading-relaxed text-lg">
               We create for real people with real occasions — weddings, festivals, celebrations, and everyday moments of beauty. Our goal is for each piece to feel like it was made just for you, even when it's part of our collection.

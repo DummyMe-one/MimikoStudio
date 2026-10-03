@@ -13,18 +13,30 @@ export default function Gallery() {
   return (
     <div>
       {/* Header */}
-      <section className="py-16 lg:py-24 bg-cream/50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+      <section className="py-20 lg:py-32 bg-cream/30 relative">
+        <div className="absolute inset-0 opacity-[0.02]" style={{backgroundImage: 'radial-gradient(circle at 1px 1px, #C9A96E 1px, transparent 0)', backgroundSize: '40px 40px'}}></div>
+        
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative">
           <ScrollReveal>
-            <p className="text-xs uppercase tracking-[0.3em] text-light-gold font-sans font-medium mb-4">
-              Gallery
+            <div className="ornament-divider mb-8">
+              <div className="w-2 h-2 border border-light-gold rotate-45"></div>
+            </div>
+            
+            <p className="section-label mb-6">
+              Visual Journey
             </p>
-            <h1 className="heading-serif text-4xl sm:text-5xl lg:text-6xl font-semibold text-espresso mb-4">
-              Our Creations
+            
+            <h1 className="display-serif text-5xl sm:text-6xl lg:text-7xl text-espresso mb-6 leading-[1.05]">
+              Our <span className="italic">Creations</span>
             </h1>
-            <p className="text-taupe max-w-xl mx-auto">
+            
+            <p className="text-taupe max-w-xl mx-auto text-lg leading-relaxed">
               A visual journey through our handcrafted jewellery, ornaments, and embroidery work.
             </p>
+            
+            <div className="ornament-divider mt-10">
+              <div className="w-2 h-2 border border-light-gold rotate-45"></div>
+            </div>
           </ScrollReveal>
         </div>
       </section>

@@ -31,7 +31,7 @@ export default function CollectionDetail() {
   return (
     <div>
       {/* Collection Header */}
-      <section className="relative py-20 lg:py-32 overflow-hidden">
+      <section className="relative py-24 lg:py-40 overflow-hidden">
         <div className="absolute inset-0">
           <img
             src={collection.coverImage}
@@ -39,17 +39,27 @@ export default function CollectionDetail() {
             className="w-full h-full object-cover"
             loading="lazy"
           />
-          <div className="absolute inset-0 bg-espresso/50" />
+          <div className="absolute inset-0 bg-gradient-to-b from-espresso/40 via-espresso/50 to-espresso/70" />
         </div>
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <ScrollReveal>
-            <p className="text-xs uppercase tracking-[0.3em] text-light-gold font-sans font-medium mb-4">
+            <div className="ornament-divider mb-8">
+              <div className="w-2 h-2 border border-light-gold/60 rotate-45"></div>
+            </div>
+            
+            <p className="section-label mb-6 text-light-gold/90">
               Collection
             </p>
-            <h1 className="heading-serif text-4xl sm:text-5xl lg:text-6xl font-semibold text-ivory mb-4">
+            
+            <h1 className="display-serif text-5xl sm:text-6xl lg:text-7xl text-ivory mb-6 leading-[1.05]">
               {collection.name}
             </h1>
-            <p className="text-ivory/80 max-w-xl mx-auto">{collection.description}</p>
+            
+            <p className="text-ivory/80 max-w-xl mx-auto text-lg leading-relaxed">{collection.description}</p>
+            
+            <div className="ornament-divider mt-10">
+              <div className="w-2 h-2 border border-light-gold/60 rotate-45"></div>
+            </div>
           </ScrollReveal>
         </div>
       </section>

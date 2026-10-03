@@ -79,16 +79,16 @@ export default function DesignDetail({ onBookClick }: DesignDetailProps) {
             <div className="lg:sticky lg:top-28">
               <Link
                 to={`/collections/${collection?.slug}`}
-                className="text-xs uppercase tracking-widest text-light-gold font-sans font-medium mb-2 inline-block hover:text-muted-gold transition-colors"
+                className="section-label mb-3 inline-block hover:text-muted-gold transition-colors"
               >
                 {collection?.name}
               </Link>
 
-              <h1 className="heading-serif text-3xl sm:text-4xl font-semibold text-espresso mb-3">
+              <h1 className="display-serif text-4xl sm:text-5xl text-espresso mb-4 leading-[1.1]">
                 {design.name}
               </h1>
 
-              <p className="text-sm text-taupe uppercase tracking-wider font-sans mb-4">
+              <p className="text-[11px] text-taupe uppercase tracking-[0.2em] font-sans font-medium mb-6">
                 {design.category}
               </p>
 
@@ -135,13 +135,13 @@ export default function DesignDetail({ onBookClick }: DesignDetailProps) {
               <div className="flex flex-col sm:flex-row gap-3 mb-8">
                 <button
                   onClick={handleBook}
-                  className="flex-1 bg-espresso text-ivory py-3.5 text-sm font-sans font-medium hover:bg-espresso/90 transition-colors"
+                  className="btn-primary flex-1"
                 >
                   Book This Design
                 </button>
                 <Link
                   to="/contact"
-                  className="flex-1 border border-espresso text-espresso py-3.5 text-sm font-sans font-medium text-center hover:bg-espresso hover:text-ivory transition-colors"
+                  className="btn-secondary flex-1 text-center"
                 >
                   Ask a Question
                 </Link>

@@ -14,7 +14,7 @@ export default function NavratriPage({ onBookClick }: NavratriPageProps) {
   return (
     <div>
       {/* Hero */}
-      <section className="relative min-h-[70vh] flex items-center overflow-hidden">
+      <section className="relative min-h-[80vh] flex items-center overflow-hidden">
         <div className="absolute inset-0">
           <img
             src="https://images.unsplash.com/photo-1610030469983-98e550d6193c?w=1400&q=80"
@@ -22,36 +22,45 @@ export default function NavratriPage({ onBookClick }: NavratriPageProps) {
             className="w-full h-full object-cover"
             loading="lazy"
           />
-          <div className="absolute inset-0 bg-gradient-to-r from-espresso/70 via-espresso/40 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-r from-espresso/80 via-espresso/50 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-t from-espresso/60 via-transparent to-transparent" />
         </div>
+        
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
-          <div className="max-w-xl">
+          <div className="max-w-2xl">
             <ScrollReveal>
-              <p className="text-xs uppercase tracking-[0.3em] text-light-gold font-sans font-medium mb-4">
-                Festive Collection
-              </p>
+              <div className="flex items-center gap-3 mb-8">
+                <div className="w-12 h-px bg-light-gold/70"></div>
+                <p className="section-label text-light-gold/90">
+                  Festive Collection
+                </p>
+              </div>
             </ScrollReveal>
+            
             <ScrollReveal delay={0.1}>
-              <h1 className="heading-serif text-4xl sm:text-5xl lg:text-6xl font-semibold text-ivory leading-[1.1] mb-4">
-                The Navratri Edit
+              <h1 className="display-serif text-5xl sm:text-6xl lg:text-7xl text-ivory leading-[1.05] mb-6">
+                The Navratri<br />
+                <span className="italic">Edit</span>
               </h1>
             </ScrollReveal>
+            
             <ScrollReveal delay={0.2}>
-              <p className="heading-serif text-xl sm:text-2xl text-ivory/80 italic mb-6">
+              <p className="display-serif text-2xl sm:text-3xl text-ivory/80 italic mb-8">
                 Handcrafted ornaments for every Garba night.
               </p>
             </ScrollReveal>
+            
             <ScrollReveal delay={0.3}>
-              <p className="text-ivory/70 leading-relaxed mb-8">
+              <p className="text-ivory/70 leading-relaxed mb-10 text-lg max-w-xl">
                 Nine nights of dance, color, and celebration deserve ornaments that move with you. Discover our handcrafted Navratri collection — vibrant chandbalis, statement jhumkas, and accessories designed for festive styling.
               </p>
-              <div className="flex flex-wrap gap-4">
+              <div className="flex flex-wrap gap-5">
                 <button
                   onClick={onBookClick}
-                  className="inline-flex items-center gap-2 bg-light-gold text-espresso px-6 py-3 text-sm font-sans font-medium hover:bg-champagne transition-colors"
+                  className="inline-flex items-center gap-3 bg-light-gold text-espresso px-7 py-3.5 text-[13px] font-sans font-medium tracking-wide hover:bg-champagne transition-all group"
                 >
-                  Book Your Festive Design
-                  <ArrowRight size={14} />
+                  Book Festive Design
+                  <ArrowRight size={14} className="transition-transform group-hover:translate-x-1" />
                 </button>
               </div>
             </ScrollReveal>
