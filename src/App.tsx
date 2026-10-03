@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { HashRouter, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './contexts/AuthContext';
+import { ThemeProvider } from './contexts/ThemeContext';
 import Layout from './components/Layout';
 import BookingModal from './components/BookingModal';
 import HomePage from './pages/Home';
@@ -27,6 +28,10 @@ import CollectionsManager from './pages/admin/CollectionsManager';
 import BookingsManager from './pages/admin/BookingsManager';
 import MessagesManager from './pages/admin/MessagesManager';
 import SetupGuide from './pages/admin/SetupGuide';
+import AppearanceStudio from './pages/admin/AppearanceStudio';
+import HomepageBuilder from './pages/admin/HomepageBuilder';
+import MediaLibrary from './pages/admin/MediaLibrary';
+import DynamicHome from './pages/DynamicHome';
 
 export default function App() {
   const [isBookingModalOpen, setIsBookingModalOpen] = useState(false);
@@ -39,8 +44,9 @@ export default function App() {
 
   return (
     <AuthProvider>
-      <HashRouter>
-        <Routes>
+      <ThemeProvider>
+        <HashRouter>
+          <Routes>
         {/* Admin Routes (no Layout wrapper) */}
         <Route path="/admin/login" element={<AdminLogin />} />
         <Route path="/admin" element={<AdminLayout />}>
@@ -51,13 +57,16 @@ export default function App() {
           <Route path="bookings" element={<BookingsManager />} />
           <Route path="messages" element={<MessagesManager />} />
           <Route path="setup" element={<SetupGuide />} />
+          <Route path="appearance" element={<AppearanceStudio />} />
+          <Route path="homepage" element={<HomepageBuilder />} />
+          <Route path="media" element={<MediaLibrary />} />
         </Route>
 
         {/* Public Routes */}
         <Route path="*" element={
           <Layout onBookClick={() => openBookingModal()}>
             <Routes>
-              <Route path="/" element={<HomePage onBookClick={openBookingModal} />} />
+              <Route path="/" element={<DynamicHome onBookClick={openBookingModal} />} />
               <Route path="/collections" element={<Collections />} />
               <Route path="/collections/:slug" element={<CollectionDetail />} />
               <Route path="/designs/:slug" element={<DesignDetail onBookClick={openBookingModal} />} />
@@ -76,12 +85,13 @@ export default function App() {
           </Layout>
         } />
       </Routes>
-        <BookingModal
-          isOpen={isBookingModalOpen}
-          onClose={() => setIsBookingModalOpen(false)}
-          prefillDesign={bookingPrefill}
-        />
-      </HashRouter>
+          <BookingModal
+            isOpen={isBookingModalOpen}
+            onClose={() => setIsBookingModalOpen(false)}
+            prefillDesign={bookingPrefill}
+          />
+        </HashRouter>
+      </ThemeProvider>
     </AuthProvider>
   );
 }
