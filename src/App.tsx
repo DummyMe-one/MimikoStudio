@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { HashRouter, Routes, Route } from 'react-router-dom';
 import Layout from './components/Layout';
 import BookingModal from './components/BookingModal';
 import HomePage from './pages/Home';
@@ -27,7 +27,7 @@ export default function App() {
   };
 
   return (
-    <BrowserRouter>
+    <HashRouter>
       <Layout onBookClick={() => openBookingModal()}>
         <Routes>
           <Route path="/" element={<HomePage onBookClick={openBookingModal} />} />
@@ -52,6 +52,6 @@ export default function App() {
         onClose={() => setIsBookingModalOpen(false)}
         prefillDesign={bookingPrefill}
       />
-    </BrowserRouter>
+    </HashRouter>
   );
 }
