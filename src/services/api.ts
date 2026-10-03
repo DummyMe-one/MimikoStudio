@@ -1,12 +1,11 @@
 // Supabase API Service - All database operations go through Supabase
 import { supabase, isSupabaseConfigured } from '../lib/supabase';
-import { designs as localDesigns, collections as localCollections } from '../data';
 
 // ============ DESIGNS ============
 export const designsApi = {
   async getAll() {
     if (!isSupabaseConfigured()) {
-      return { success: true, data: localDesigns };
+      return { success: true, data: [] };
     }
     const { data, error } = await supabase
       .from('designs')
@@ -31,8 +30,7 @@ export const designsApi = {
 
   async getBySlug(slug: string) {
     if (!isSupabaseConfigured()) {
-      const design = localDesigns.find((d) => d.slug === slug);
-      return design ? { success: true, data: design } : { success: false, error: 'Not found' };
+      return { success: false, error: 'Not configured' };
     }
     const { data, error } = await supabase
       .from('designs')
@@ -157,7 +155,7 @@ export const designsApi = {
 export const collectionsApi = {
   async getAll() {
     if (!isSupabaseConfigured()) {
-      return { success: true, data: localCollections };
+      return { success: true, data: [] };
     }
     const { data, error } = await supabase
       .from('collections')

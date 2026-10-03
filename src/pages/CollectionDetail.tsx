@@ -6,7 +6,7 @@ import { useDesigns, useCollections } from '../hooks/useData';
 export default function CollectionDetail() {
   const { slug } = useParams<{ slug: string }>();
   const { collections } = useCollections();
-  const { designs } = useDesigns();
+  const { designs, loading } = useDesigns();
   
   const collection = collections.find((c) => c.slug === slug);
   const [filter, setFilter] = useState('all');
@@ -78,7 +78,11 @@ export default function CollectionDetail() {
       {/* Designs Grid */}
       <section className="py-12 lg:py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          {filteredDesigns.length === 0 ? (
+          {loading ? (
+            <div className="text-center py-16">
+              <p className="text-taupe">Loading designs...</p>
+            </div>
+          ) : filteredDesigns.length === 0 ? (
             <div className="text-center py-16">
               <p className="text-taupe heading-serif text-xl">
                 No designs are currently available in this category.

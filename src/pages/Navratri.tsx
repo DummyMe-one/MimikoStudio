@@ -8,7 +8,7 @@ interface NavratriPageProps {
 }
 
 export default function NavratriPage({ onBookClick }: NavratriPageProps) {
-  const { designs } = useDesigns();
+  const { designs, loading } = useDesigns();
   const navratriDesigns = designs.filter((d) => (d.collectionId === 'navratri') || (d as any).collection_id === 'navratri');
 
   return (
@@ -92,8 +92,18 @@ export default function NavratriPage({ onBookClick }: NavratriPageProps) {
               Navratri Designs
             </h2>
           </ScrollReveal>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
-            {navratriDesigns.map((design, idx) => (
+          {loading ? (
+            <div className="text-center py-12">
+              <p className="text-taupe">Loading designs...</p>
+            </div>
+          ) : navratriDesigns.length === 0 ? (
+            <div className="text-center py-12">
+              <p className="text-taupe mb-2">No Navratri designs available yet.</p>
+              <p className="text-sm text-taupe/70">Navratri designs will appear here once added by the admin.</p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
+              {navratriDesigns.map((design, idx) => (
               <ScrollReveal key={design.id} delay={idx * 0.1}>
                 <Link to={`/designs/${design.slug}`} className="group block">
                   <div className="relative aspect-[3/4] overflow-hidden bg-cream mb-4">
@@ -124,7 +134,8 @@ export default function NavratriPage({ onBookClick }: NavratriPageProps) {
                 </Link>
               </ScrollReveal>
             ))}
-          </div>
+            </div>
+          )}
         </div>
       </section>
 

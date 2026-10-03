@@ -1,11 +1,10 @@
 import { useState, useEffect } from 'react';
 import { designsApi, collectionsApi } from '../services/api';
-import { designs as localDesigns, collections as localCollections } from '../data';
 import type { Design, Collection } from '../data';
 
-// Hook to fetch designs from Supabase (with local fallback)
+// Hook to fetch designs from Supabase (real-time only)
 export function useDesigns() {
-  const [designs, setDesigns] = useState<Design[]>(localDesigns);
+  const [designs, setDesigns] = useState<Design[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -14,11 +13,7 @@ export function useDesigns() {
       setLoading(true);
       const res = await designsApi.getAll();
       if (!cancelled) {
-        if (res.success && res.data && res.data.length > 0) {
-          setDesigns(res.data);
-        } else {
-          setDesigns(localDesigns);
-        }
+        setDesigns(res.success && res.data ? res.data : []);
         setLoading(false);
       }
     };
@@ -29,9 +24,9 @@ export function useDesigns() {
   return { designs, loading };
 }
 
-// Hook to fetch collections from Supabase (with local fallback)
+// Hook to fetch collections from Supabase (real-time only)
 export function useCollections() {
-  const [collections, setCollections] = useState<Collection[]>(localCollections);
+  const [collections, setCollections] = useState<Collection[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -40,11 +35,7 @@ export function useCollections() {
       setLoading(true);
       const res = await collectionsApi.getAll();
       if (!cancelled) {
-        if (res.success && res.data && res.data.length > 0) {
-          setCollections(res.data);
-        } else {
-          setCollections(localCollections);
-        }
+        setCollections(res.success && res.data ? res.data : []);
         setLoading(false);
       }
     };
@@ -55,7 +46,7 @@ export function useCollections() {
   return { collections, loading };
 }
 
-// Hook to fetch a single design by slug
+// Hook to fetch a single design by slug (real-time only)
 export function useDesign(slug: string | undefined) {
   const [design, setDesign] = useState<Design | null>(null);
   const [loading, setLoading] = useState(true);
@@ -70,19 +61,12 @@ export function useDesign(slug: string | undefined) {
     const fetchDesign = async () => {
       setLoading(true);
       setNotFound(false);
-      // Try Supabase first
       const res = await designsApi.getBySlug(slug);
       if (!cancelled) {
         if (res.success && res.data) {
           setDesign(res.data);
         } else {
-          // Fallback to local data
-          const local = localDesigns.find((d) => d.slug === slug);
-          if (local) {
-            setDesign(local);
-          } else {
-            setNotFound(true);
-          }
+          setNotFound(true);
         }
         setLoading(false);
       }

@@ -4,7 +4,7 @@ import ScrollReveal from '../components/ScrollReveal';
 import { useDesigns } from '../hooks/useData';
 
 export default function Embroidery() {
-  const { designs } = useDesigns();
+  const { designs, loading } = useDesigns();
   const embroideryDesigns = designs.filter((d) => (d.collectionId === 'embroidery') || (d as any).collection_id === 'embroidery');
 
   return (
@@ -134,8 +134,18 @@ export default function Embroidery() {
             </div>
           </ScrollReveal>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
-            {embroideryDesigns.map((design, idx) => (
+          {loading ? (
+            <div className="text-center py-12">
+              <p className="text-taupe">Loading designs...</p>
+            </div>
+          ) : embroideryDesigns.length === 0 ? (
+            <div className="text-center py-12">
+              <p className="text-taupe mb-2">No embroidery designs available yet.</p>
+              <p className="text-sm text-taupe/70">Embroidery designs will appear here once added by the admin.</p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
+              {embroideryDesigns.map((design, idx) => (
               <ScrollReveal key={design.id} delay={idx * 0.1}>
                 <Link to={`/designs/${design.slug}`} className="group block">
                   <div className="relative aspect-[3/4] overflow-hidden bg-cream mb-4">
@@ -153,7 +163,8 @@ export default function Embroidery() {
                 </Link>
               </ScrollReveal>
             ))}
-          </div>
+            </div>
+          )}
         </div>
       </section>
 

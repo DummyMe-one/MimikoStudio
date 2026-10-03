@@ -1,7 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { Plus, Edit2, Trash2, X, Upload } from 'lucide-react';
 import { designsApi, collectionsApi, uploadApi } from '../../services/api';
-import { designs as localDesigns, collections as localCollections } from '../../data';
 import { isSupabaseConfigured } from '../../lib/supabase';
 
 interface DesignForm {
@@ -39,8 +38,8 @@ export default function DesignsManager() {
       designsApi.getAll(),
       collectionsApi.getAll(),
     ]);
-    setDesigns(designsRes.success ? designsRes.data! : localDesigns);
-    setCollections(collectionsRes.success ? collectionsRes.data! : localCollections);
+    setDesigns(designsRes.success && designsRes.data ? designsRes.data : []);
+    setCollections(collectionsRes.success && collectionsRes.data ? collectionsRes.data : []);
     setLoading(false);
   };
 

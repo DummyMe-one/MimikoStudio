@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Plus, Edit2, Trash2, X } from 'lucide-react';
 import { collectionsApi } from '../../services/api';
-import { collections as localCollections } from '../../data';
 
 interface CollectionForm {
   name: string;
@@ -27,7 +26,7 @@ export default function CollectionsManager() {
 
   const loadCollections = async () => {
     const res = await collectionsApi.getAll();
-    setCollections(res.success ? res.data! : localCollections);
+    setCollections(res.success && res.data ? res.data : []);
     setLoading(false);
   };
 

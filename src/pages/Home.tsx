@@ -8,11 +8,12 @@ interface HomePageProps {
 }
 
 export default function HomePage({ onBookClick }: HomePageProps) {
-  const { designs } = useDesigns();
-  const { collections } = useCollections();
+  const { designs, loading: designsLoading } = useDesigns();
+  const { collections, loading: collectionsLoading } = useCollections();
   
   const featuredCollections = collections.filter((c) => c.featured).slice(0, 5);
   const featuredDesigns = designs.filter((d) => d.featured).slice(0, 6);
+  const isLoading = designsLoading || collectionsLoading;
 
   return (
     <div>
@@ -99,6 +100,17 @@ export default function HomePage({ onBookClick }: HomePageProps) {
             </div>
           </ScrollReveal>
 
+          {isLoading ? (
+            <div className="text-center py-12">
+              <p className="text-taupe">Loading collections...</p>
+            </div>
+          ) : featuredCollections.length === 0 ? (
+            <div className="text-center py-12">
+              <p className="text-taupe mb-2">No collections available yet.</p>
+              <p className="text-sm text-taupe/70">Collections will appear here once added by the admin.</p>
+            </div>
+          ) : (
+
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-4 lg:gap-6">
             {/* Large feature card */}
             <ScrollReveal className="lg:col-span-7 lg:row-span-2">
@@ -165,6 +177,7 @@ export default function HomePage({ onBookClick }: HomePageProps) {
               </ScrollReveal>
             ))}
           </div>
+          )}
         </div>
       </section>
 
@@ -190,8 +203,18 @@ export default function HomePage({ onBookClick }: HomePageProps) {
             </div>
           </ScrollReveal>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
-            {featuredDesigns.map((design, idx) => (
+          {isLoading ? (
+            <div className="text-center py-12">
+              <p className="text-taupe">Loading designs...</p>
+            </div>
+          ) : featuredDesigns.length === 0 ? (
+            <div className="text-center py-12">
+              <p className="text-taupe mb-2">No featured designs available yet.</p>
+              <p className="text-sm text-taupe/70">Designs will appear here once added by the admin.</p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
+              {featuredDesigns.map((design, idx) => (
               <ScrollReveal key={design.id} delay={idx * 0.1}>
                 <Link to={`/designs/${design.slug}`} className="group block">
                   <div className="relative aspect-[3/4] overflow-hidden bg-cream mb-4">
@@ -222,7 +245,8 @@ export default function HomePage({ onBookClick }: HomePageProps) {
                 </Link>
               </ScrollReveal>
             ))}
-          </div>
+            </div>
+          )}
         </div>
       </section>
 
