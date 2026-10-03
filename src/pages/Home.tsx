@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 import { ArrowRight, Sparkles, Palette, Heart, Star } from 'lucide-react';
 import ScrollReveal from '../components/ScrollReveal';
+import EmptyState from '../components/EmptyState';
 import { useDesigns, useCollections } from '../hooks/useData';
 
 interface HomePageProps {
@@ -18,97 +19,132 @@ export default function HomePage({ onBookClick }: HomePageProps) {
   return (
     <div>
       {/* HERO SECTION */}
-      <section className="relative min-h-[90vh] flex items-center overflow-hidden">
+      <section className="relative min-h-screen flex items-center overflow-hidden">
         <div className="absolute inset-0">
           <img
             src="https://images.unsplash.com/photo-1515562141589-67f0d569b6f5?w=1600&q=80"
             alt="Mimiko Studio - Handcrafted jewellery and ornaments"
             className="w-full h-full object-cover"
           />
-          <div className="absolute inset-0 bg-gradient-to-r from-ivory/90 via-ivory/70 to-ivory/30" />
+          <div className="absolute inset-0 bg-gradient-to-r from-ivory via-ivory/80 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-t from-ivory/50 via-transparent to-transparent" />
         </div>
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
-          <div className="max-w-2xl">
+        
+        {/* Decorative elements */}
+        <div className="absolute top-1/4 right-10 w-px h-32 bg-gradient-to-b from-transparent via-light-gold/30 to-transparent hidden lg:block"></div>
+        <div className="absolute bottom-1/4 right-20 w-px h-24 bg-gradient-to-b from-transparent via-light-gold/20 to-transparent hidden lg:block"></div>
+        
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 lg:py-0">
+          <div className="max-w-3xl">
             <ScrollReveal>
-              <p className="text-xs uppercase tracking-[0.3em] text-muted-gold font-sans font-medium mb-4">
-                MIMIKO STUDIO
-              </p>
+              <div className="flex items-center gap-3 mb-8">
+                <div className="w-12 h-px bg-light-gold"></div>
+                <p className="section-label">
+                  Mimiko Atelier
+                </p>
+              </div>
             </ScrollReveal>
+            
             <ScrollReveal delay={0.1}>
-              <h1 className="heading-serif text-4xl sm:text-5xl lg:text-7xl font-semibold text-espresso leading-[1.1] mb-6">
+              <h1 className="display-serif text-5xl sm:text-6xl lg:text-[5.5rem] text-espresso leading-[1.05] mb-8">
                 Crafted to Adorn.
                 <br />
-                <span className="text-muted-gold">Designed to Remember.</span>
+                <span className="italic text-muted-gold">Designed to Remember.</span>
               </h1>
             </ScrollReveal>
+            
             <ScrollReveal delay={0.2}>
-              <p className="text-taupe text-base sm:text-lg leading-relaxed mb-8 max-w-lg">
+              <p className="text-taupe text-lg leading-relaxed mb-10 max-w-xl">
                 Discover handcrafted jewellery, traditional ornaments and artistic creations made for your most beautiful occasions.
               </p>
             </ScrollReveal>
+            
             <ScrollReveal delay={0.3}>
-              <div className="flex flex-wrap gap-4">
+              <div className="flex flex-wrap gap-5">
                 <Link
                   to="/collections"
-                  className="inline-flex items-center gap-2 bg-espresso text-ivory px-7 py-3.5 text-sm font-sans font-medium hover:bg-espresso/90 transition-all hover:gap-3"
+                  className="btn-primary inline-flex items-center gap-3 group"
                 >
                   Explore Collection
-                  <ArrowRight size={16} />
+                  <ArrowRight size={15} className="transition-transform group-hover:translate-x-1" />
                 </Link>
                 <button
                   onClick={onBookClick}
-                  className="inline-flex items-center gap-2 border border-espresso text-espresso px-7 py-3.5 text-sm font-sans font-medium hover:bg-espresso hover:text-ivory transition-all"
+                  className="btn-secondary inline-flex items-center gap-2"
                 >
-                  Book a Design
+                  Book Consultation
                 </button>
               </div>
             </ScrollReveal>
           </div>
         </div>
+        
+        {/* Scroll indicator */}
+        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 hidden lg:flex flex-col items-center gap-2">
+          <p className="text-[10px] tracking-[0.2em] text-taupe/60 uppercase">Scroll</p>
+          <div className="w-px h-12 bg-gradient-to-b from-light-gold/50 to-transparent"></div>
+        </div>
       </section>
 
       {/* INTRODUCTION */}
-      <section className="py-20 lg:py-28">
+      <section className="py-24 lg:py-32 relative">
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-px h-16 bg-gradient-to-b from-transparent via-light-gold/30 to-transparent"></div>
+        
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <ScrollReveal>
             <div className="text-center max-w-3xl mx-auto">
-              <p className="text-xs uppercase tracking-[0.3em] text-light-gold font-sans font-medium mb-4">
-                Welcome to Mimiko Studio
+              <div className="ornament-divider mb-8">
+                <div className="w-2 h-2 border border-light-gold rotate-45"></div>
+              </div>
+              
+              <p className="section-label mb-6">
+                The Art of Adornment
               </p>
-              <h2 className="heading-serif text-3xl sm:text-4xl lg:text-5xl font-semibold text-espresso mb-6">
-                Where Craftsmanship Meets Celebration
+              
+              <h2 className="display-serif text-4xl sm:text-5xl lg:text-6xl text-espresso mb-8 leading-[1.1]">
+                Where Craftsmanship<br />
+                <span className="italic">Meets Celebration</span>
               </h2>
-              <p className="text-taupe leading-relaxed text-base sm:text-lg">
+              
+              <p className="text-taupe leading-relaxed text-lg max-w-2xl mx-auto">
                 Every piece from Mimiko Studio is a celebration of Indian artistry — handcrafted with patience, designed with intention, and made to be treasured. From bridal jewellery to festive Navratri ornaments, we create pieces that become part of your story.
               </p>
+              
+              <div className="ornament-divider mt-10">
+                <div className="w-2 h-2 border border-light-gold rotate-45"></div>
+              </div>
             </div>
           </ScrollReveal>
         </div>
       </section>
 
       {/* FEATURED COLLECTIONS */}
-      <section className="py-16 lg:py-24 bg-cream/50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <section className="py-24 lg:py-32 bg-cream/30 relative">
+        {/* Subtle pattern overlay */}
+        <div className="absolute inset-0 opacity-[0.02]" style={{backgroundImage: 'radial-gradient(circle at 1px 1px, #C9A96E 1px, transparent 0)', backgroundSize: '40px 40px'}}></div>
+        
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
           <ScrollReveal>
-            <div className="text-center mb-12 lg:mb-16">
-              <p className="text-xs uppercase tracking-[0.3em] text-light-gold font-sans font-medium mb-3">
-                Our World
+            <div className="text-center mb-16 lg:mb-20">
+              <p className="section-label mb-4">
+                Curated Collections
               </p>
-              <h2 className="heading-serif text-3xl sm:text-4xl font-semibold text-espresso">
-                Discover Our Collections
+              <h2 className="display-serif text-4xl sm:text-5xl lg:text-6xl text-espresso leading-[1.1]">
+                Discover Our <span className="italic">World</span>
               </h2>
             </div>
           </ScrollReveal>
 
           {isLoading ? (
             <div className="text-center py-12">
-              <p className="text-taupe">Loading collections...</p>
+              <div className="shimmer w-32 h-4 mx-auto mb-3 rounded"></div>
+              <div className="shimmer w-48 h-4 mx-auto rounded"></div>
             </div>
           ) : featuredCollections.length === 0 ? (
-            <div className="text-center py-12">
-              <p className="text-taupe mb-2">No collections available yet.</p>
-              <p className="text-sm text-taupe/70">Collections will appear here once added by the admin.</p>
-            </div>
+            <EmptyState 
+              title="Collections Coming Soon" 
+              description="Our curated collections are being prepared. Check back soon to discover beautiful handcrafted pieces."
+            />
           ) : (
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-4 lg:gap-6">
@@ -182,36 +218,43 @@ export default function HomePage({ onBookClick }: HomePageProps) {
       </section>
 
       {/* SIGNATURE DESIGNS */}
-      <section className="py-16 lg:py-24">
+      <section className="py-24 lg:py-32">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <ScrollReveal>
-            <div className="flex flex-col sm:flex-row items-start sm:items-end justify-between mb-12">
+            <div className="flex flex-col sm:flex-row items-start sm:items-end justify-between mb-16">
               <div>
-                <p className="text-xs uppercase tracking-[0.3em] text-light-gold font-sans font-medium mb-3">
-                  Handpicked
+                <p className="section-label mb-4">
+                  Featured Pieces
                 </p>
-                <h2 className="heading-serif text-3xl sm:text-4xl font-semibold text-espresso">
-                  Signature Designs
+                <h2 className="display-serif text-4xl sm:text-5xl text-espresso leading-[1.1]">
+                  Signature <span className="italic">Designs</span>
                 </h2>
               </div>
               <Link
                 to="/collections"
-                className="mt-4 sm:mt-0 inline-flex items-center gap-2 text-sm text-espresso/70 hover:text-espresso transition-colors gold-underline"
+                className="mt-6 sm:mt-0 inline-flex items-center gap-3 text-[13px] text-espresso/70 hover:text-espresso transition-colors gold-underline tracking-wide group"
               >
-                View All Designs <ArrowRight size={14} />
+                View All Designs 
+                <ArrowRight size={14} className="transition-transform group-hover:translate-x-1" />
               </Link>
             </div>
           </ScrollReveal>
 
           {isLoading ? (
-            <div className="text-center py-12">
-              <p className="text-taupe">Loading designs...</p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
+              {[1, 2, 3].map((i) => (
+                <div key={i}>
+                  <div className="shimmer aspect-[3/4] rounded mb-4"></div>
+                  <div className="shimmer w-24 h-3 mb-2 rounded"></div>
+                  <div className="shimmer w-40 h-4 rounded"></div>
+                </div>
+              ))}
             </div>
           ) : featuredDesigns.length === 0 ? (
-            <div className="text-center py-12">
-              <p className="text-taupe mb-2">No featured designs available yet.</p>
-              <p className="text-sm text-taupe/70">Designs will appear here once added by the admin.</p>
-            </div>
+            <EmptyState 
+              title="Designs Coming Soon" 
+              description="Our signature designs are being crafted with care. Soon you'll discover unique pieces made for your most beautiful occasions."
+            />
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
               {featuredDesigns.map((design, idx) => (

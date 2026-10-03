@@ -37,37 +37,45 @@ export default function Layout({ children, onBookClick }: LayoutProps) {
   return (
     <div className="min-h-screen bg-ivory">
       {/* Announcement Bar */}
-      <div className="bg-espresso text-ivory text-center py-2 px-4 text-xs tracking-widest uppercase font-sans">
-        Handcrafted with love • Free consultation for custom designs
+      <div className="bg-espresso text-ivory/90 text-center py-2.5 px-4 text-[10px] tracking-[0.2em] uppercase font-sans font-medium">
+        <span className="inline-flex items-center gap-3">
+          <span className="w-1 h-1 bg-light-gold rounded-full"></span>
+          Handcrafted with love
+          <span className="w-1 h-1 bg-light-gold rounded-full"></span>
+          Free consultation for custom designs
+          <span className="w-1 h-1 bg-light-gold rounded-full"></span>
+        </span>
       </div>
 
       {/* Header */}
       <header
-        className={`sticky top-0 z-50 transition-all duration-500 ${
+        className={`sticky top-0 z-50 transition-all duration-700 ${
           isScrolled
-            ? 'bg-ivory/95 backdrop-blur-md shadow-sm border-b border-champagne/30'
-            : 'bg-ivory'
+            ? 'glass shadow-sm border-b border-champagne/20'
+            : 'bg-ivory border-b border-transparent'
         }`}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16 lg:h-20">
+          <div className="flex items-center justify-between h-16 lg:h-24">
             {/* Logo */}
-            <Link to="/" className="flex items-center">
-              <span className="heading-serif text-2xl lg:text-3xl font-semibold text-espresso tracking-wide">
-                MIMIKO
-              </span>
-              <span className="heading-serif text-2xl lg:text-3xl font-light text-muted-gold ml-1">
-                STUDIO
-              </span>
+            <Link to="/" className="flex items-center group">
+              <div className="flex flex-col">
+                <span className="heading-serif text-2xl lg:text-[1.75rem] font-semibold text-espresso tracking-wide leading-none">
+                  MIMIKO
+                </span>
+                <span className="text-[9px] tracking-[0.3em] text-muted-gold font-sans font-medium mt-0.5">
+                  ATELIER
+                </span>
+              </div>
             </Link>
 
             {/* Desktop Nav */}
-            <nav className="hidden lg:flex items-center space-x-8">
+            <nav className="hidden lg:flex items-center space-x-10">
               {navLinks.map((link) => (
                 <Link
                   key={link.to}
                   to={link.to}
-                  className="gold-underline text-sm font-sans font-medium text-espresso/80 hover:text-espresso transition-colors"
+                  className="gold-underline text-[13px] font-sans font-medium text-espresso/70 hover:text-espresso transition-colors tracking-wide"
                 >
                   {link.label}
                 </Link>
@@ -78,10 +86,10 @@ export default function Layout({ children, onBookClick }: LayoutProps) {
             <div className="flex items-center gap-4">
               <button
                 onClick={onBookClick}
-                className="hidden lg:inline-flex items-center gap-2 bg-espresso text-ivory px-5 py-2.5 text-sm font-sans font-medium rounded-sm hover:bg-espresso/90 transition-colors"
+                className="hidden lg:inline-flex items-center gap-2 btn-primary"
               >
-                <ShoppingBag size={14} />
-                Book a Design
+                <ShoppingBag size={13} />
+                Book Consultation
               </button>
               <button
                 onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
@@ -130,28 +138,39 @@ export default function Layout({ children, onBookClick }: LayoutProps) {
       <main>{children}</main>
 
       {/* Footer */}
-      <footer className="bg-espresso text-ivory/80">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+      <footer className="bg-espresso text-ivory/80 relative overflow-hidden">
+        {/* Decorative top border */}
+        <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-light-gold/30 to-transparent"></div>
+        
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12">
             {/* Brand */}
             <div className="lg:col-span-1">
-              <h3 className="heading-serif text-2xl font-semibold text-ivory mb-2">
-                MIMIKO <span className="text-light-gold">STUDIO</span>
-              </h3>
-              <p className="text-sm mt-4 leading-relaxed text-ivory/60">
+              <div className="mb-6">
+                <h3 className="heading-serif text-3xl font-semibold text-ivory leading-none">
+                  MIMIKO
+                </h3>
+                <p className="text-[10px] tracking-[0.3em] text-light-gold font-sans font-medium mt-1">
+                  ATELIER
+                </p>
+              </div>
+              <p className="text-sm leading-relaxed text-ivory/60 mb-4">
                 Jewellery • Ornaments • Embroidery • Custom Designs
               </p>
-              <p className="text-sm mt-4 leading-relaxed text-ivory/60">
-                Crafted to Adorn. Designed to Remember.
+              <div className="ornament-divider justify-start my-6">
+                <div className="w-12 h-px bg-gradient-to-r from-light-gold/50 to-transparent"></div>
+              </div>
+              <p className="text-sm italic text-ivory/50 heading-serif">
+                "Crafted to Adorn. Designed to Remember."
               </p>
             </div>
 
             {/* Navigation */}
             <div>
-              <h4 className="text-xs uppercase tracking-widest text-light-gold mb-4 font-sans font-medium">
+              <h4 className="text-[11px] uppercase tracking-[0.2em] text-light-gold mb-6 font-sans font-medium">
                 Explore
               </h4>
-              <ul className="space-y-3">
+              <ul className="space-y-4">
                 {[
                   { to: '/collections', label: 'Collections' },
                   { to: '/navratri', label: 'Navratri' },
@@ -162,7 +181,7 @@ export default function Layout({ children, onBookClick }: LayoutProps) {
                   <li key={link.to}>
                     <Link
                       to={link.to}
-                      className="text-sm text-ivory/60 hover:text-light-gold transition-colors"
+                      className="text-sm text-ivory/60 hover:text-light-gold transition-colors gold-underline"
                     >
                       {link.label}
                     </Link>
@@ -198,44 +217,46 @@ export default function Layout({ children, onBookClick }: LayoutProps) {
 
             {/* Contact */}
             <div>
-              <h4 className="text-xs uppercase tracking-widest text-light-gold mb-4 font-sans font-medium">
+              <h4 className="text-[11px] uppercase tracking-[0.2em] text-light-gold mb-6 font-sans font-medium">
                 Get in Touch
               </h4>
-              <ul className="space-y-3 text-sm text-ivory/60">
+              <ul className="space-y-4 text-sm text-ivory/60">
                 <li>
-                  <a href="mailto:hello@mimikostudio.com" className="hover:text-light-gold transition-colors">
+                  <a href="mailto:hello@mimikostudio.com" className="hover:text-light-gold transition-colors gold-underline">
                     hello@mimikostudio.com
                   </a>
                 </li>
                 <li>
-                  <a href="https://instagram.com/mimikostudio" target="_blank" rel="noopener noreferrer" className="hover:text-light-gold transition-colors">
+                  <a href="https://instagram.com/mimikostudio" target="_blank" rel="noopener noreferrer" className="hover:text-light-gold transition-colors gold-underline">
                     @mimikostudio
                   </a>
                 </li>
               </ul>
-              <div className="mt-6">
+              <div className="mt-8">
                 <Link
                   to="/booking"
-                  className="inline-block border border-light-gold text-light-gold px-5 py-2 text-sm font-sans hover:bg-light-gold hover:text-espresso transition-colors"
+                  className="inline-block border border-light-gold/50 text-light-gold px-6 py-2.5 text-[11px] tracking-[0.15em] uppercase font-sans font-medium hover:bg-light-gold hover:text-espresso transition-all duration-300"
                 >
-                  Book a Design
+                  Book Consultation
                 </Link>
               </div>
             </div>
           </div>
 
           {/* Bottom */}
-          <div className="mt-16 pt-8 border-t border-ivory/10 flex flex-col sm:flex-row items-center justify-between gap-4">
-            <p className="text-xs text-ivory/40">
-              © {new Date().getFullYear()} Mimiko Studio. All rights reserved.
-            </p>
-            <div className="flex items-center gap-6">
-              <Link to="/privacy" className="text-xs text-ivory/40 hover:text-light-gold transition-colors">
-                Privacy
-              </Link>
-              <Link to="/terms" className="text-xs text-ivory/40 hover:text-light-gold transition-colors">
-                Terms
-              </Link>
+          <div className="mt-20 pt-8 border-t border-ivory/10">
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+              <p className="text-[11px] text-ivory/40 tracking-wide">
+                © {new Date().getFullYear()} Mimiko Studio. All rights reserved.
+              </p>
+              <div className="flex items-center gap-8">
+                <Link to="/privacy" className="text-[11px] text-ivory/40 hover:text-light-gold transition-colors tracking-wide">
+                  Privacy Policy
+                </Link>
+                <Link to="/terms" className="text-[11px] text-ivory/40 hover:text-light-gold transition-colors tracking-wide">
+                  Terms & Conditions
+                </Link>
+              </div>
             </div>
           </div>
         </div>
