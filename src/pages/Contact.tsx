@@ -1,15 +1,17 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
-import { Mail, Phone, MessageCircle, Instagram, Check } from 'lucide-react';
+import { MapPin, Phone, Mail, Clock, Check } from 'lucide-react';
+import { enquiriesApi } from '../services/electronicsApi';
 import ScrollReveal from '../components/ScrollReveal';
 
-interface ContactPageProps {
-  onBookClick: () => void;
-}
-
-export default function Contact({ onBookClick }: ContactPageProps) {
+export default function Contact() {
   const [submitted, setSubmitted] = useState(false);
-  const [formData, setFormData] = useState({ name: '', email: '', subject: '', message: '' });
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    phone: '',
+    subject: '',
+    message: '',
+  });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -17,32 +19,25 @@ export default function Contact({ onBookClick }: ContactPageProps) {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const { contactApi } = await import('../services/api');
-    const res = await contactApi.create({
-      name: formData.name,
-      email: formData.email,
-      subject: formData.subject,
-      message: formData.message,
+    await enquiriesApi.create({
+      customerName: formData.name,
+      customerEmail: formData.email,
+      customerPhone: formData.phone,
+      enquiryType: 'GENERAL',
+      message: `${formData.subject}\n\n${formData.message}`,
     });
-    if (res.success) {
-      setSubmitted(true);
-    }
+    setSubmitted(true);
   };
 
   return (
-    <div>
+    <div className="bg-background min-h-screen">
       {/* Header */}
-      <section className="py-16 lg:py-24 bg-cream/50">
+      <section className="py-16 lg:py-20 bg-surface">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <ScrollReveal>
-            <p className="text-xs uppercase tracking-[0.3em] text-light-gold font-sans font-medium mb-4">
-              Get in Touch
-            </p>
-            <h1 className="heading-serif text-4xl sm:text-5xl lg:text-6xl font-semibold text-espresso mb-4">
-              Contact Mimiko Studio
-            </h1>
-            <p className="text-taupe max-w-xl mx-auto">
-              Jewellery • Ornaments • Embroidery • Custom Designs
+            <h1 className="text-4xl lg:text-5xl font-bold text-text mb-4">Contact Us</h1>
+            <p className="text-text-secondary text-lg max-w-2xl mx-auto">
+              Visit our showroom or get in touch. We're here to help you find the perfect electronics for your needs.
             </p>
           </ScrollReveal>
         </div>
@@ -55,57 +50,69 @@ export default function Contact({ onBookClick }: ContactPageProps) {
             {/* Contact Info */}
             <ScrollReveal direction="left">
               <div>
-                <h2 className="heading-serif text-3xl font-semibold text-espresso mb-6">
-                  We'd Love to Hear From You
-                </h2>
-                <p className="text-taupe leading-relaxed mb-8">
-                  Whether you have a question about our collections, want to discuss a custom design, or need help with a booking — we're here to help.
+                <h2 className="text-3xl font-bold text-text mb-6">Get in Touch</h2>
+                <p className="text-text-secondary leading-relaxed mb-8">
+                  Whether you have a question about our products, need help with a purchase, or want to visit our showroom — we're here to help.
                 </p>
 
                 <div className="space-y-6 mb-10">
-                  <a href="mailto:hello@mimikostudio.com" className="flex items-center gap-4 group">
-                    <div className="w-12 h-12 flex items-center justify-center border border-champagne rounded-full group-hover:border-light-gold transition-colors">
-                      <Mail size={18} className="text-muted-gold" />
+                  <div className="flex items-start gap-4">
+                    <div className="w-12 h-12 flex items-center justify-center border border-border rounded-lg bg-background">
+                      <MapPin size={20} className="text-primary" />
                     </div>
                     <div>
-                      <p className="text-xs uppercase tracking-wider text-taupe font-sans">Email</p>
-                      <p className="text-espresso group-hover:text-muted-gold transition-colors">hello@mimikostudio.com</p>
+                      <p className="text-xs uppercase tracking-wider text-text-secondary font-semibold mb-1">Address</p>
+                      <p className="text-text">Main Market, Your City, State - 123456</p>
                     </div>
-                  </a>
+                  </div>
 
-                  <a href="https://wa.me/" target="_blank" rel="noopener noreferrer" className="flex items-center gap-4 group">
-                    <div className="w-12 h-12 flex items-center justify-center border border-champagne rounded-full group-hover:border-light-gold transition-colors">
-                      <MessageCircle size={18} className="text-muted-gold" />
+                  <div className="flex items-start gap-4">
+                    <div className="w-12 h-12 flex items-center justify-center border border-border rounded-lg bg-background">
+                      <Phone size={20} className="text-primary" />
                     </div>
                     <div>
-                      <p className="text-xs uppercase tracking-wider text-taupe font-sans">WhatsApp</p>
-                      <p className="text-espresso group-hover:text-muted-gold transition-colors">Message us on WhatsApp</p>
+                      <p className="text-xs uppercase tracking-wider text-text-secondary font-semibold mb-1">Phone</p>
+                      <a href="tel:+919876543210" className="text-text hover:text-primary transition-colors">+91 98765 43210</a>
                     </div>
-                  </a>
+                  </div>
 
-                  <a href="https://instagram.com/mimikostudio" target="_blank" rel="noopener noreferrer" className="flex items-center gap-4 group">
-                    <div className="w-12 h-12 flex items-center justify-center border border-champagne rounded-full group-hover:border-light-gold transition-colors">
-                      <Instagram size={18} className="text-muted-gold" />
+                  <div className="flex items-start gap-4">
+                    <div className="w-12 h-12 flex items-center justify-center border border-border rounded-lg bg-background">
+                      <Mail size={20} className="text-primary" />
                     </div>
                     <div>
-                      <p className="text-xs uppercase tracking-wider text-taupe font-sans">Instagram</p>
-                      <p className="text-espresso group-hover:text-muted-gold transition-colors">@mimikostudio</p>
+                      <p className="text-xs uppercase tracking-wider text-text-secondary font-semibold mb-1">Email</p>
+                      <a href="mailto:info@shivamelectronics.com" className="text-text hover:text-primary transition-colors">info@shivamelectronics.com</a>
                     </div>
-                  </a>
+                  </div>
+
+                  <div className="flex items-start gap-4">
+                    <div className="w-12 h-12 flex items-center justify-center border border-border rounded-lg bg-background">
+                      <Clock size={20} className="text-primary" />
+                    </div>
+                    <div>
+                      <p className="text-xs uppercase tracking-wider text-text-secondary font-semibold mb-1">Hours</p>
+                      <p className="text-text">Mon-Sat: 10:00 AM - 9:00 PM</p>
+                      <p className="text-text-secondary text-sm">Sunday: Closed</p>
+                    </div>
+                  </div>
                 </div>
 
                 <div className="flex flex-wrap gap-4">
-                  <button
-                    onClick={onBookClick}
-                    className="inline-flex items-center gap-2 bg-espresso text-ivory px-6 py-3 text-sm font-sans font-medium hover:bg-espresso/90 transition-colors"
-                  >
-                    Book a Design
-                  </button>
                   <a
-                    href="mailto:hello@mimikostudio.com?subject=Enquiry"
-                    className="inline-flex items-center gap-2 border border-espresso text-espresso px-6 py-3 text-sm font-sans font-medium hover:bg-espresso hover:text-ivory transition-colors"
+                    href="tel:+919876543210"
+                    className="inline-flex items-center gap-2 bg-primary text-white px-6 py-3 rounded-lg font-semibold hover:bg-primary-dark transition-colors"
                   >
-                    Send an Enquiry
+                    <Phone size={18} />
+                    Call Now
+                  </a>
+                  <a
+                    href="https://wa.me/919876543210"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 bg-success text-white px-6 py-3 rounded-lg font-semibold hover:bg-success/90 transition-colors"
+                  >
+                    WhatsApp
                   </a>
                 </div>
               </div>
@@ -114,69 +121,77 @@ export default function Contact({ onBookClick }: ContactPageProps) {
             {/* Contact Form */}
             <ScrollReveal direction="right">
               {submitted ? (
-                <div className="bg-cream/50 p-8 lg:p-12 text-center">
-                  <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center mx-auto mb-6">
-                    <Check size={32} className="text-muted-gold" />
+                <div className="bg-surface p-8 lg:p-12 text-center rounded-xl border border-border">
+                  <div className="w-16 h-16 bg-success/10 rounded-full flex items-center justify-center mx-auto mb-6">
+                    <Check size={32} className="text-success" />
                   </div>
-                  <h3 className="heading-serif text-2xl font-semibold text-espresso mb-3">
-                    Message Sent
-                  </h3>
-                  <p className="text-taupe text-sm">
-                    Thank you for reaching out. We'll get back to you within 24-48 hours.
+                  <h3 className="text-2xl font-bold text-text mb-3">Message Sent!</h3>
+                  <p className="text-text-secondary">
+                    Thank you for reaching out. We'll get back to you within 24 hours.
                   </p>
                 </div>
               ) : (
-                <div className="bg-cream/50 p-6 sm:p-8 lg:p-10">
-                  <h3 className="heading-serif text-xl font-semibold text-espresso mb-6">
-                    Send Us a Message
-                  </h3>
+                <div className="bg-surface p-6 sm:p-8 lg:p-10 rounded-xl border border-border">
+                  <h3 className="text-2xl font-bold text-text mb-6">Send Us a Message</h3>
                   <form onSubmit={handleSubmit} className="space-y-4">
                     <div>
-                      <label className="block text-xs uppercase tracking-wider text-taupe font-sans mb-1.5">Name</label>
+                      <label className="block text-xs uppercase tracking-wider text-text-secondary font-semibold mb-1.5">Name *</label>
                       <input
                         type="text"
                         name="name"
                         value={formData.name}
                         onChange={handleChange}
                         required
-                        className="w-full border border-champagne bg-white px-4 py-2.5 text-sm text-espresso rounded-sm focus:border-light-gold focus:outline-none transition-colors"
+                        className="w-full border border-border bg-background px-4 py-3 text-text rounded-lg focus:border-primary focus:outline-none transition-colors"
                       />
                     </div>
-                    <div>
-                      <label className="block text-xs uppercase tracking-wider text-taupe font-sans mb-1.5">Email</label>
-                      <input
-                        type="email"
-                        name="email"
-                        value={formData.email}
-                        onChange={handleChange}
-                        required
-                        className="w-full border border-champagne bg-white px-4 py-2.5 text-sm text-espresso rounded-sm focus:border-light-gold focus:outline-none transition-colors"
-                      />
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-xs uppercase tracking-wider text-text-secondary font-semibold mb-1.5">Email</label>
+                        <input
+                          type="email"
+                          name="email"
+                          value={formData.email}
+                          onChange={handleChange}
+                          className="w-full border border-border bg-background px-4 py-3 text-text rounded-lg focus:border-primary focus:outline-none transition-colors"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-xs uppercase tracking-wider text-text-secondary font-semibold mb-1.5">Phone *</label>
+                        <input
+                          type="tel"
+                          name="phone"
+                          value={formData.phone}
+                          onChange={handleChange}
+                          required
+                          className="w-full border border-border bg-background px-4 py-3 text-text rounded-lg focus:border-primary focus:outline-none transition-colors"
+                        />
+                      </div>
                     </div>
                     <div>
-                      <label className="block text-xs uppercase tracking-wider text-taupe font-sans mb-1.5">Subject</label>
+                      <label className="block text-xs uppercase tracking-wider text-text-secondary font-semibold mb-1.5">Subject</label>
                       <input
                         type="text"
                         name="subject"
                         value={formData.subject}
                         onChange={handleChange}
-                        className="w-full border border-champagne bg-white px-4 py-2.5 text-sm text-espresso rounded-sm focus:border-light-gold focus:outline-none transition-colors"
+                        className="w-full border border-border bg-background px-4 py-3 text-text rounded-lg focus:border-primary focus:outline-none transition-colors"
                       />
                     </div>
                     <div>
-                      <label className="block text-xs uppercase tracking-wider text-taupe font-sans mb-1.5">Message</label>
+                      <label className="block text-xs uppercase tracking-wider text-text-secondary font-semibold mb-1.5">Message *</label>
                       <textarea
                         name="message"
                         value={formData.message}
                         onChange={handleChange}
                         required
                         rows={5}
-                        className="w-full border border-champagne bg-white px-4 py-2.5 text-sm text-espresso rounded-sm focus:border-light-gold focus:outline-none transition-colors resize-none"
+                        className="w-full border border-border bg-background px-4 py-3 text-text rounded-lg focus:border-primary focus:outline-none transition-colors resize-none"
                       />
                     </div>
                     <button
                       type="submit"
-                      className="w-full bg-espresso text-ivory py-3 text-sm font-sans font-medium hover:bg-espresso/90 transition-colors"
+                      className="w-full bg-primary text-white py-3.5 rounded-lg font-semibold hover:bg-primary-dark transition-colors"
                     >
                       Send Message
                     </button>
@@ -185,22 +200,6 @@ export default function Contact({ onBookClick }: ContactPageProps) {
               )}
             </ScrollReveal>
           </div>
-        </div>
-      </section>
-
-      {/* Studio Image */}
-      <section className="py-12 lg:py-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <ScrollReveal>
-            <div className="aspect-[21/9] overflow-hidden">
-              <img
-                src="https://images.unsplash.com/photo-1573408301185-9146fe634ad0?w=1400&q=80"
-                alt="Mimiko Studio"
-                className="w-full h-full object-cover"
-                loading="lazy"
-              />
-            </div>
-          </ScrollReveal>
         </div>
       </section>
     </div>
