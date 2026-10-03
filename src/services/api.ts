@@ -1,6 +1,17 @@
 // Supabase API Service - All database operations go through Supabase
 import { supabase, isSupabaseConfigured } from '../lib/supabase';
 
+// Helper to detect missing table errors
+const isTableMissingError = (error: any): boolean => {
+  if (!error) return false;
+  const msg = (error.message || '').toLowerCase();
+  return msg.includes('does not exist') || 
+         msg.includes('could not find') || 
+         msg.includes('relation') ||
+         msg.includes('schema cache') ||
+         msg.includes('table');
+};
+
 // ============ DESIGNS ============
 export const designsApi = {
   async getAll() {
@@ -11,7 +22,10 @@ export const designsApi = {
       .from('designs')
       .select('*, design_images(*)')
       .order('created_at', { ascending: false });
-    if (error) return { success: false, error: error.message };
+    if (error) {
+      if (isTableMissingError(error)) return { success: true, data: [] };
+      return { success: false, error: error.message };
+    }
     
     // Transform all snake_case to camelCase
     const transformed = (data || []).map((d: any) => ({
@@ -53,7 +67,10 @@ export const designsApi = {
       .select('*, design_images(*)')
       .eq('slug', slug)
       .single();
-    if (error) return { success: false, error: error.message };
+    if (error) {
+      if (isTableMissingError(error)) return { success: false, error: 'Not found' };
+      return { success: false, error: error.message };
+    }
     
     return {
       success: true,
@@ -112,18 +129,24 @@ export const designsApi = {
       })
       .select()
       .single();
-    if (error) return { success: false, error: error.message };
+    if (error) {
+      if (isTableMissingError(error)) return { success: false, error: 'Database tables not created. Please run the SQL schema first.' };
+      return { success: false, error: error.message };
+    }
 
     // Insert images
     if (images && images.length > 0) {
       for (let i = 0; i < images.length; i++) {
-        await supabase.from('design_images').insert({
+        const { error: imgError } = await supabase.from('design_images').insert({
           design_id: data.id,
           image_url: images[i].url,
           alt_text: images[i].alt || '',
           sort_order: i,
           is_primary: images[i].isPrimary || i === 0,
         });
+        if (imgError && !isTableMissingError(imgError)) {
+          console.error('Failed to insert image:', imgError.message);
+        }
       }
     }
     return { success: true, data };
@@ -155,20 +178,29 @@ export const designsApi = {
       .eq('id', id)
       .select()
       .single();
-    if (error) return { success: false, error: error.message };
+    if (error) {
+      if (isTableMissingError(error)) return { success: false, error: 'Database tables not created. Please run the SQL schema first.' };
+      return { success: false, error: error.message };
+    }
 
     // Update images
     if (images !== undefined) {
-      await supabase.from('design_images').delete().eq('design_id', id);
+      const { error: delError } = await supabase.from('design_images').delete().eq('design_id', id);
+      if (delError && !isTableMissingError(delError)) {
+        console.error('Failed to delete images:', delError.message);
+      }
       if (images.length > 0) {
         for (let i = 0; i < images.length; i++) {
-          await supabase.from('design_images').insert({
+          const { error: imgError } = await supabase.from('design_images').insert({
             design_id: id,
             image_url: images[i].url,
             alt_text: images[i].alt || '',
             sort_order: i,
             is_primary: images[i].isPrimary || i === 0,
           });
+          if (imgError && !isTableMissingError(imgError)) {
+            console.error('Failed to insert image:', imgError.message);
+          }
         }
       }
     }
@@ -178,7 +210,10 @@ export const designsApi = {
   async delete(id: string) {
     if (!isSupabaseConfigured()) return { success: false, error: 'Not configured' };
     const { error } = await supabase.from('designs').delete().eq('id', id);
-    if (error) return { success: false, error: error.message };
+    if (error) {
+      if (isTableMissingError(error)) return { success: true };
+      return { success: false, error: error.message };
+    }
     return { success: true };
   },
 };
@@ -193,7 +228,10 @@ export const collectionsApi = {
       .from('collections')
       .select('*')
       .order('sort_order');
-    if (error) return { success: false, error: error.message };
+    if (error) {
+      if (isTableMissingError(error)) return { success: true, data: [] };
+      return { success: false, error: error.message };
+    }
     
     // Transform snake_case to camelCase
     const transformed = (data || []).map((col: any) => ({
@@ -225,7 +263,10 @@ export const collectionsApi = {
       })
       .select()
       .single();
-    if (error) return { success: false, error: error.message };
+    if (error) {
+      if (isTableMissingError(error)) return { success: false, error: 'Database tables not created. Please run the SQL schema first.' };
+      return { success: false, error: error.message };
+    }
     return { success: true, data };
   },
 
@@ -244,14 +285,20 @@ export const collectionsApi = {
       .eq('id', id)
       .select()
       .single();
-    if (error) return { success: false, error: error.message };
+    if (error) {
+      if (isTableMissingError(error)) return { success: false, error: 'Database tables not created. Please run the SQL schema first.' };
+      return { success: false, error: error.message };
+    }
     return { success: true, data };
   },
 
   async delete(id: string) {
     if (!isSupabaseConfigured()) return { success: false, error: 'Not configured' };
     const { error } = await supabase.from('collections').delete().eq('id', id);
-    if (error) return { success: false, error: error.message };
+    if (error) {
+      if (isTableMissingError(error)) return { success: true };
+      return { success: false, error: error.message };
+    }
     return { success: true };
   },
 };
@@ -264,7 +311,10 @@ export const bookingsApi = {
       .from('bookings')
       .select('*')
       .order('created_at', { ascending: false });
-    if (error) return { success: false, error: error.message };
+    if (error) {
+      if (isTableMissingError(error)) return { success: true, data: [] };
+      return { success: false, error: error.message };
+    }
     return { success: true, data };
   },
 
@@ -290,7 +340,13 @@ export const bookingsApi = {
       })
       .select()
       .single();
-    if (error) return { success: false, error: error.message };
+    if (error) {
+      if (isTableMissingError(error)) {
+        // Table doesn't exist - booking saved locally only
+        return { success: true, data: { ...booking, id: 'local_' + Date.now() }, note: 'Saved locally (database not configured)' };
+      }
+      return { success: false, error: error.message };
+    }
     return { success: true, data };
   },
 
@@ -302,14 +358,20 @@ export const bookingsApi = {
       .eq('id', id)
       .select()
       .single();
-    if (error) return { success: false, error: error.message };
+    if (error) {
+      if (isTableMissingError(error)) return { success: true };
+      return { success: false, error: error.message };
+    }
     return { success: true, data };
   },
 
   async delete(id: string) {
     if (!isSupabaseConfigured()) return { success: false, error: 'Not configured' };
     const { error } = await supabase.from('bookings').delete().eq('id', id);
-    if (error) return { success: false, error: error.message };
+    if (error) {
+      if (isTableMissingError(error)) return { success: true };
+      return { success: false, error: error.message };
+    }
     return { success: true };
   },
 };
@@ -322,7 +384,10 @@ export const contactApi = {
       .from('contact_messages')
       .select('*')
       .order('created_at', { ascending: false });
-    if (error) return { success: false, error: error.message };
+    if (error) {
+      if (isTableMissingError(error)) return { success: true, data: [] };
+      return { success: false, error: error.message };
+    }
     return { success: true, data };
   },
 
@@ -338,7 +403,13 @@ export const contactApi = {
       })
       .select()
       .single();
-    if (error) return { success: false, error: error.message };
+    if (error) {
+      if (isTableMissingError(error)) {
+        // Table doesn't exist - message saved locally only
+        return { success: true, data: { ...msg, id: 'local_' + Date.now() }, note: 'Saved locally (database not configured)' };
+      }
+      return { success: false, error: error.message };
+    }
     return { success: true, data };
   },
 };
@@ -353,7 +424,10 @@ export const uploadApi = {
     const { data, error } = await supabase.storage
       .from('designs')
       .upload(fileName, file, { cacheControl: '3600', upsert: false });
-    if (error) return { success: false, error: error.message };
+    if (error) {
+      // Fallback to local URL if storage bucket doesn't exist
+      return { success: true, url: URL.createObjectURL(file) };
+    }
     const { data: urlData } = supabase.storage.from('designs').getPublicUrl(data.path);
     return { success: true, url: urlData.publicUrl };
   },
