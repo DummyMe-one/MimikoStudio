@@ -15,9 +15,18 @@ export default function Contact({ onBookClick }: ContactPageProps) {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setSubmitted(true);
+    const { contactApi } = await import('../services/api');
+    const res = await contactApi.create({
+      name: formData.name,
+      email: formData.email,
+      subject: formData.subject,
+      message: formData.message,
+    });
+    if (res.success) {
+      setSubmitted(true);
+    }
   };
 
   return (

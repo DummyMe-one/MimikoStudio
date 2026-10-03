@@ -21,9 +21,16 @@ export default function CustomDesign() {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setSubmitted(true);
+    const { contactApi } = await import('../services/api');
+    const res = await contactApi.create({
+      name: formData.name,
+      email: formData.email,
+      subject: `Custom Design Request - ${formData.category || 'General'}`,
+      message: `Occasion: ${formData.occasion}\nDate: ${formData.preferredDate}\nColor: ${formData.colorPreference}\nBudget: ${formData.budgetRange}\n\nDescription: ${formData.description}\n\nNotes: ${formData.notes}\n\nPhone: ${formData.phone}`,
+    });
+    if (res.success) setSubmitted(true);
   };
 
   return (

@@ -1,33 +1,35 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Lock, Eye, EyeOff } from 'lucide-react';
-import { auth } from '../../services/api';
+import { Lock, Eye, EyeOff, AlertCircle } from 'lucide-react';
+import { useAuth } from '../../contexts/AuthContext';
 
 export default function AdminLogin() {
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const { signIn, isConfigured } = useAuth();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
     setLoading(true);
 
-    try {
-      const result = await auth.login(password);
-      if (result.success && result.data?.token) {
-        localStorage.setItem('adminToken', result.data.token);
-        navigate('/admin/dashboard');
-      } else {
-        setError(result.error || 'Invalid password');
-      }
-    } catch (err) {
-      setError('Login failed. Please try again.');
-    } finally {
+    if (!isConfigured) {
+      setError('Supabase not configured. Please set VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY.');
       setLoading(false);
+      return;
     }
+
+    const result = await signIn(email, password);
+    if (result.error) {
+      setError(result.error);
+    } else {
+      navigate('/admin/dashboard');
+    }
+    setLoading(false);
   };
 
   return (
@@ -41,10 +43,35 @@ export default function AdminLogin() {
         </div>
 
         <div className="bg-white p-8 shadow-sm border border-champagne/30">
+          {!isConfigured && (
+            <div className="mb-4 p-3 bg-amber-50 border border-amber-200 text-sm text-amber-800">
+              <p className="font-medium mb-1">Setup Required</p>
+              <p className="text-xs">Create a <code>.env</code> file with your Supabase credentials:</p>
+              <code className="text-xs block mt-2 bg-amber-100 p-2 rounded">
+                VITE_SUPABASE_URL=...<br />
+                VITE_SUPABASE_ANON_KEY=...
+              </code>
+            </div>
+          )}
+
           <form onSubmit={handleSubmit} className="space-y-5">
             <div>
-              <label className="block text-xs uppercase tracking-wider text-taupe font-sans mb-2">
-                Admin Password
+              <label className="block text-xs uppercase tracking-wider text-taupe font-sans mb-1.5">
+                Email
+              </label>
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="w-full border border-champagne bg-ivory px-4 py-3 text-sm text-espresso rounded-sm focus:border-light-gold focus:outline-none transition-colors"
+                placeholder="admin@mimikostudio.com"
+                required
+              />
+            </div>
+
+            <div>
+              <label className="block text-xs uppercase tracking-wider text-taupe font-sans mb-1.5">
+                Password
               </label>
               <div className="relative">
                 <input
@@ -52,7 +79,7 @@ export default function AdminLogin() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   className="w-full border border-champagne bg-ivory px-4 py-3 pr-12 text-sm text-espresso rounded-sm focus:border-light-gold focus:outline-none transition-colors"
-                  placeholder="Enter admin password"
+                  placeholder="Enter your password"
                   required
                 />
                 <button
@@ -66,7 +93,8 @@ export default function AdminLogin() {
             </div>
 
             {error && (
-              <div className="text-red-600 text-sm bg-red-50 p-3 rounded">
+              <div className="flex items-center gap-2 text-red-600 text-sm bg-red-50 p-3 rounded">
+                <AlertCircle size={16} />
                 {error}
               </div>
             )}

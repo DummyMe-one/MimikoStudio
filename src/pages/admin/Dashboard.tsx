@@ -14,21 +14,15 @@ export default function Dashboard() {
   const [recentBookings, setRecentBookings] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    loadDashboardData();
-  }, []);
+  useEffect(() => { loadDashboardData(); }, []);
 
   const loadDashboardData = async () => {
-    const token = localStorage.getItem('adminToken');
-    if (!token) return;
-
     try {
-      // Try API first, fall back to local data
       const [designsRes, collectionsRes, bookingsRes, messagesRes] = await Promise.all([
         designsApi.getAll(),
         collectionsApi.getAll(),
-        bookingsApi.getAll(token),
-        contactApi.getAll(token),
+        bookingsApi.getAll(),
+        contactApi.getAll(),
       ]);
 
       const designsData = designsRes.success ? designsRes.data! : localDesigns;
@@ -45,7 +39,6 @@ export default function Dashboard() {
       });
       setRecentBookings(bookingsData.slice(0, 5));
     } catch (err) {
-      // Use local data as fallback
       setStats({
         designs: localDesigns.length,
         collections: localCollections.length,
@@ -66,11 +59,7 @@ export default function Dashboard() {
   ];
 
   if (loading) {
-    return (
-      <div className="flex items-center justify-center py-20">
-        <p className="text-taupe">Loading dashboard...</p>
-      </div>
-    );
+    return <div className="flex items-center justify-center py-20"><p className="text-taupe">Loading dashboard...</p></div>;
   }
 
   return (
@@ -80,7 +69,6 @@ export default function Dashboard() {
         <p className="text-taupe text-sm">Welcome back to Mimiko Studio admin panel</p>
       </div>
 
-      {/* Stats Grid */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
         {statCards.map((stat, idx) => (
           <div key={idx} className="bg-white p-5 border border-champagne/30">
@@ -94,7 +82,6 @@ export default function Dashboard() {
         ))}
       </div>
 
-      {/* New Bookings Alert */}
       {stats.newBookings > 0 && (
         <div className="bg-light-gold/10 border border-light-gold/30 p-4 mb-8 flex items-center gap-3">
           <ClipboardList size={20} className="text-muted-gold" />
@@ -102,20 +89,15 @@ export default function Dashboard() {
             <p className="text-sm font-medium text-espresso">
               {stats.newBookings} new booking{stats.newBookings > 1 ? 's' : ''} awaiting response
             </p>
-            <a href="/admin/bookings" className="text-xs text-muted-gold underline">
-              View bookings →
-            </a>
+            <a href="#/admin/bookings" className="text-xs text-muted-gold underline">View bookings →</a>
           </div>
         </div>
       )}
 
-      {/* Recent Bookings */}
       <div className="bg-white border border-champagne/30">
         <div className="p-5 border-b border-champagne/30 flex items-center justify-between">
           <h2 className="heading-serif text-xl font-semibold text-espresso">Recent Bookings</h2>
-          <a href="/admin/bookings" className="text-xs text-muted-gold hover:underline">
-            View all
-          </a>
+          <a href="#/admin/bookings" className="text-xs text-muted-gold hover:underline">View all</a>
         </div>
         {recentBookings.length === 0 ? (
           <div className="p-8 text-center text-taupe text-sm">
@@ -126,8 +108,8 @@ export default function Dashboard() {
             {recentBookings.map((booking) => (
               <div key={booking.id} className="p-4 flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-espresso">{booking.customerName}</p>
-                  <p className="text-xs text-taupe">{booking.designName || 'Custom request'}</p>
+                  <p className="text-sm font-medium text-espresso">{booking.customer_name || booking.customerName}</p>
+                  <p className="text-xs text-taupe">{booking.design_name || booking.designName || 'Custom request'}</p>
                 </div>
                 <span className={`text-xs px-2 py-1 rounded-full ${
                   booking.status === 'NEW' ? 'bg-light-gold/20 text-muted-gold' :

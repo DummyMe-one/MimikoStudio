@@ -1,19 +1,22 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation, Outlet } from 'react-router-dom';
 import { LayoutDashboard, Package, FolderOpen, ClipboardList, MessageSquare, LogOut, Menu, X, ExternalLink } from 'lucide-react';
+import { useAuth } from '../../contexts/AuthContext';
 
 export default function AdminLayout() {
   const navigate = useNavigate();
   const location = useLocation();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const { user, signOut, loading, isConfigured } = useAuth();
 
   useEffect(() => {
-    const token = localStorage.getItem('adminToken');
-    if (!token) navigate('/admin/login');
-  }, [navigate]);
+    if (!loading && !user && isConfigured) {
+      navigate('/admin/login');
+    }
+  }, [navigate, user, loading, isConfigured]);
 
-  const handleLogout = () => {
-    localStorage.removeItem('adminToken');
+  const handleLogout = async () => {
+    await signOut();
     navigate('/admin/login');
   };
 

@@ -40,8 +40,27 @@ export default function BookingModal({ isOpen, onClose, prefillDesign }: Booking
       setError('Please fill in all required fields.');
       return;
     }
-    // Simulate API call
-    setSubmitted(true);
+    // Submit to Supabase
+    const { bookingsApi } = await import('../services/api');
+    const res = await bookingsApi.create({
+      customerName: formData.customerName,
+      email: formData.email,
+      phone: formData.phone,
+      designId: prefillDesign?.id,
+      designName: prefillDesign?.name,
+      collection: prefillDesign?.collection,
+      occasion: formData.occasion,
+      requestedDate: formData.requestedDate,
+      quantity: formData.quantity,
+      customization: formData.customization,
+      colorPreference: formData.colorPreference,
+      notes: formData.notes,
+    });
+    if (res.success) {
+      setSubmitted(true);
+    } else {
+      setError(res.error || 'Failed to submit booking. Please try again.');
+    }
   };
 
   const handleClose = () => {

@@ -33,8 +33,6 @@ export default function CollectionsManager() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const token = localStorage.getItem('adminToken');
-    if (!token) return;
 
     const payload = {
       ...form,
@@ -42,9 +40,9 @@ export default function CollectionsManager() {
     };
 
     if (editingId) {
-      await collectionsApi.update(editingId, payload, token);
+      await collectionsApi.update(editingId, payload);
     } else {
-      await collectionsApi.create(payload, token);
+      await collectionsApi.create(payload);
     }
     await loadCollections();
     closeForm();
@@ -65,9 +63,7 @@ export default function CollectionsManager() {
 
   const handleDelete = async (id: string) => {
     if (!confirm('Delete this collection? Designs in it will become unassigned.')) return;
-    const token = localStorage.getItem('adminToken');
-    if (!token) return;
-    await collectionsApi.delete(id, token);
+    await collectionsApi.delete(id);
     await loadCollections();
   };
 

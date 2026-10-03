@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { HashRouter, Routes, Route } from 'react-router-dom';
+import { AuthProvider } from './contexts/AuthContext';
 import Layout from './components/Layout';
 import BookingModal from './components/BookingModal';
 import HomePage from './pages/Home';
@@ -36,8 +37,9 @@ export default function App() {
   };
 
   return (
-    <HashRouter>
-      <Routes>
+    <AuthProvider>
+      <HashRouter>
+        <Routes>
         {/* Admin Routes (no Layout wrapper) */}
         <Route path="/admin/login" element={<AdminLogin />} />
         <Route path="/admin" element={<AdminLayout />}>
@@ -72,11 +74,12 @@ export default function App() {
           </Layout>
         } />
       </Routes>
-      <BookingModal
-        isOpen={isBookingModalOpen}
-        onClose={() => setIsBookingModalOpen(false)}
-        prefillDesign={bookingPrefill}
-      />
-    </HashRouter>
+        <BookingModal
+          isOpen={isBookingModalOpen}
+          onClose={() => setIsBookingModalOpen(false)}
+          prefillDesign={bookingPrefill}
+        />
+      </HashRouter>
+    </AuthProvider>
   );
 }

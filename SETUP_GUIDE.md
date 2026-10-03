@@ -1,249 +1,304 @@
-# Mimiko Studio - Setup Guide
+# 🎉 Mimiko Studio - Complete Setup Guide (Supabase)
 
-## 🎉 Your Website is Ready!
-
-This is a complete, production-ready jewellery studio website with:
-- ✅ Public-facing site for customers to browse and inquire
-- ✅ Admin panel to manage designs, collections, bookings, and messages
-- ✅ Cloudinary integration for image uploads
-- ✅ Neon DB for data storage
-- ✅ Fully responsive design
+Your entire website is now a **single self-contained app** powered by Supabase. No separate backend needed!
 
 ---
 
-## 📦 What's Included
+## 🏗️ Architecture
 
-### Frontend (React + Vite)
-- Customer-facing pages (Home, Collections, Designs, Navratri, Embroidery, etc.)
-- Admin panel at `/admin` (login required)
-- Booking modal system
-- Contact forms
-- Responsive design for all devices
+```
+┌─────────────────────────────────────────┐
+│         Mimiko Studio (React)           │
+│                                         │
+│  Public Site        Admin Panel         │
+│  /                  /#/admin            │
+│  /collections       /#/admin/designs    │
+│  /navratri          /#/admin/bookings   │
+│  /booking           etc.                │
+│                                         │
+│         All via Supabase SDK            │
+└──────────────┬──────────────────────────┘
+               │
+               ▼
+┌─────────────────────────────────────────┐
+│            SUPABASE                     │
+│                                         │
+│  📦 Database    → PostgreSQL            │
+│  🔐 Auth        → Admin login          │
+│  🖼️ Storage     → Image uploads        │
+│  🔌 API         → Auto-generated REST  │
+│  🔒 RLS         → Security policies    │
+└─────────────────────────────────────────┘
+```
 
-### Backend (Express + Neon DB)
-- REST API for all CRUD operations
-- Authentication with JWT
-- Cloudinary image upload support
-- Database schema for designs, collections, bookings, messages
+**One platform. Everything included. Free tier available.**
 
 ---
 
-## 🚀 Quick Start
+## 🚀 Setup in 5 Steps
 
-### 1. Set Up Neon Database
+### Step 1: Create Supabase Project (2 minutes)
 
-1. Go to [Neon.tech](https://neon.tech) and create a free account
-2. Create a new project
-3. Copy the **connection string** (looks like: `postgresql://user:pass@ep-xxx.neon.tech/db`)
-4. Open the **SQL Editor** in Neon dashboard
-5. Copy and run the contents of `backend/schema.sql`
-6. This creates all tables and default collections
+1. Go to [supabase.com](https://supabase.com) → Sign up (free)
+2. Click **"New Project"**
+3. Name it: `mimiko-studio`
+4. Set a database password (save it!)
+5. Choose region closest to you
+6. Wait ~2 minutes for it to initialize
 
-### 2. Set Up Cloudinary (for image uploads)
+### Step 2: Run Database Schema (1 minute)
 
-1. Go to [Cloudinary.com](https://cloudinary.com) and create a free account
-2. Note your **Cloud Name** from the dashboard
-3. Go to **Settings → Upload** and create an **Unsigned Upload Preset**
-   - Name it something like `mimiko-studio`
-   - Save the preset name
-4. You'll need these values:
-   - Cloud Name
-   - Upload Preset name
+1. In Supabase Dashboard, go to **SQL Editor** (left sidebar)
+2. Click **"New Query"**
+3. Open the file `supabase/schema.sql` from this project
+4. Copy ALL the SQL and paste into the editor
+5. Click **"Run"** (or press Ctrl+Enter)
+6. ✅ Tables, policies, and default collections are created!
 
-### 3. Deploy Backend API
+### Step 3: Create Storage Bucket (30 seconds)
 
-#### Option A: Render.com (Recommended - Free)
+The schema already creates the `designs` bucket. Verify:
+1. Go to **Storage** in Supabase sidebar
+2. You should see a bucket called `designs`
+3. If not, create it manually:
+   - Click "New bucket"
+   - Name: `designs`
+   - Toggle **"Public bucket"** ON
+   - Click Create
 
-1. Go to [Render.com](https://render.com) and sign up
-2. Create a new **Web Service**
-3. Connect your GitHub repo
-4. Set **Root Directory** to `backend`
-5. Set **Build Command**: `npm install`
-6. Set **Start Command**: `npm start`
-7. Add **Environment Variables**:
-   ```
-   DATABASE_URL=your_neon_connection_string
-   ADMIN_PASSWORD=your_secure_password
-   JWT_SECRET=random_secret_string
-   ```
-8. Deploy! You'll get a URL like `https://mimiko-api.onrender.com`
+### Step 4: Create Admin User (1 minute)
 
-#### Option B: Local Development
+1. Go to **Authentication → Users** in Supabase sidebar
+2. Click **"Add user" → "Create new user"**
+3. Enter:
+   - Email: `admin@mimikostudio.com` (or your email)
+   - Password: Choose a strong password
+   - ✅ **Auto Confirm User** (check this box)
+4. Click **"Create user"**
+
+### Step 5: Configure Frontend (30 seconds)
+
+1. In Supabase Dashboard, go to **Settings → API**
+2. Copy these two values:
+   - **Project URL** (e.g., `https://abc123.supabase.co`)
+   - **anon public key** (starts with `eyJ...`)
+3. Create a `.env` file in the project root:
+
+```env
+VITE_SUPABASE_URL=https://abc123.supabase.co
+VITE_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+```
+
+4. **Done!** 🎉
+
+---
+
+## 🛠️ Run Locally
 
 ```bash
-cd backend
-cp .env.example .env
-# Edit .env with your values
 npm install
 npm run dev
 ```
 
-### 4. Configure Frontend
+Visit:
+- Public site: `http://localhost:3000/`
+- Admin panel: `http://localhost:3000/#/admin/login`
 
-Create a `.env` file in the **root** directory (not backend):
+Login with the admin email/password you created in Step 4.
 
-```env
-VITE_API_URL=https://your-backend-url.onrender.com/api
-VITE_CLOUDINARY_CLOUD_NAME=your_cloud_name
-VITE_CLOUDINARY_UPLOAD_PRESET=your_upload_preset_name
-```
+---
 
-### 5. Build & Deploy Frontend
+## 🌐 Deploy to GitHub Pages
 
 ```bash
-npm install
 npm run build
 ```
 
-Deploy the `dist` folder to GitHub Pages, Netlify, Vercel, or any static host.
+Upload the `dist` folder contents to your `gh-pages` branch.
+
+Or use GitHub Actions (automatic):
+
+```yaml
+# .github/workflows/deploy.yml
+name: Deploy
+on:
+  push:
+    branches: [main]
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 18
+      - run: npm install
+      - run: npm run build
+      - uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./dist
+```
+
+**Important:** Add your `.env` values to GitHub repo secrets if needed, or commit them (anon key is safe to expose - security is handled by RLS policies).
 
 ---
 
-## 🔐 Admin Access
+## 📋 What You Can Do
 
-1. Go to `yoursite.com/#/admin/login`
-2. Enter the password you set in `ADMIN_PASSWORD`
-3. You'll see the admin dashboard
+### As Admin (/#/admin):
+- ✅ **Add/Edit/Delete designs** with multiple images
+- ✅ **Upload images** directly to Supabase Storage
+- ✅ **Set pricing** (fixed, starting from, on request)
+- ✅ **Manage collections** (categories)
+- ✅ **View bookings** from customers
+- ✅ **Update booking status** (NEW → CONTACTED → CONFIRMED → COMPLETED)
+- ✅ **View contact messages**
+- ✅ **Mark designs as featured** (show on homepage)
 
-### Admin Features:
-- **Dashboard** - Overview stats and recent bookings
-- **Designs** - Add/edit/delete products with images and pricing
-- **Collections** - Manage collection categories
-- **Bookings** - View and manage customer booking requests
-- **Messages** - View contact form submissions
-
----
-
-## 📸 Image Upload
-
-When adding a design in the admin panel:
-1. Click the upload button
-2. Select images (multiple allowed)
-3. Images are uploaded to Cloudinary automatically
-4. Set a primary image by clicking the star icon
-5. Remove images with the X button
-
-**Without Cloudinary:** Images are stored as local previews only (not persistent).
+### As Customer:
+- ✅ Browse all designs and collections
+- ✅ View design details with multiple images
+- ✅ Submit booking requests
+- ✅ Send contact enquiries
+- ✅ Request custom designs
 
 ---
 
-## 🗄️ Database Structure
+## 🔒 Security
 
-### Tables:
-- `collections` - Product categories
-- `designs` - Individual products/designs
-- `design_images` - Multiple images per design
-- `bookings` - Customer booking requests
-- `contact_messages` - Contact form submissions
+Everything is secured through **Row Level Security (RLS)**:
 
-### Key Features:
-- UUIDs for all IDs
-- Automatic timestamps
-- Cascading deletes
-- Indexed for performance
+| Action | Public | Admin |
+|--------|--------|-------|
+| View designs | ✅ | ✅ |
+| View collections | ✅ | ✅ |
+| Create booking | ✅ | ✅ |
+| Send message | ✅ | ✅ |
+| Edit designs | ❌ | ✅ |
+| Delete designs | ❌ | ✅ |
+| Upload images | ❌ | ✅ |
+| View all bookings | ❌ | ✅ |
 
----
-
-## 🌐 Deployment Checklist
-
-### Backend (API):
-- [ ] Neon database created and schema applied
-- [ ] Backend deployed (Render/Railway/etc.)
-- [ ] Environment variables set (DATABASE_URL, ADMIN_PASSWORD, JWT_SECRET)
-- [ ] API endpoint accessible (test with curl or browser)
-
-### Frontend:
-- [ ] `.env` file created with VITE_API_URL
-- [ ] Cloudinary configured (optional but recommended)
-- [ ] Build successful (`npm run build`)
-- [ ] Deployed to static host (GitHub Pages/Netlify/Vercel)
-
-### Admin:
-- [ ] Access `/admin/login`
-- [ ] Login with your ADMIN_PASSWORD
-- [ ] Test adding a design
-- [ ] Test uploading images
-- [ ] Test creating a booking
+The `anon` key is safe to expose in frontend code because RLS policies control what can be done.
 
 ---
 
-## 🔧 Troubleshooting
+## 💰 Cost
 
-### Blank screen on GitHub Pages?
-- Make sure `base: './'` is in `vite.config.js`
-- Use `HashRouter` (already configured)
+**Supabase Free Tier includes:**
+- 500 MB database
+- 1 GB file storage
+- 2 GB bandwidth/month
+- 50,000 monthly active users
+- Unlimited API requests
+
+**More than enough for a boutique studio website!**
+
+---
+
+## 📁 Project Structure
+
+```
+mimiko-studio/
+├── src/
+│   ├── components/         # Reusable UI components
+│   │   ├── Layout.tsx      # Header + Footer
+│   │   ├── BookingModal.tsx
+│   │   ├── ImageGallery.tsx
+│   │   └── ScrollReveal.tsx
+│   ├── contexts/
+│   │   └── AuthContext.tsx  # Admin auth state
+│   ├── data/
+│   │   └── index.ts        # Sample data (fallback)
+│   ├── lib/
+│   │   └── supabase.ts     # Supabase client
+│   ├── pages/
+│   │   ├── Home.tsx
+│   │   ├── Collections.tsx
+│   │   ├── DesignDetail.tsx
+│   │   ├── Navratri.tsx
+│   │   ├── Embroidery.tsx
+│   │   ├── Booking.tsx
+│   │   ├── Contact.tsx
+│   │   ├── admin/          # Admin panel pages
+│   │   │   ├── Login.tsx
+│   │   │   ├── Dashboard.tsx
+│   │   │   ├── DesignsManager.tsx
+│   │   │   ├── CollectionsManager.tsx
+│   │   │   ├── BookingsManager.tsx
+│   │   │   └── MessagesManager.tsx
+│   │   └── ...
+│   ├── services/
+│   │   └── api.ts          # All Supabase queries
+│   └── App.tsx
+├── supabase/
+│   └── schema.sql          # Database schema
+├── .env.example
+└── SETUP_GUIDE.md
+```
+
+---
+
+## 🐛 Troubleshooting
+
+### "Supabase not configured" message?
+- Check `.env` file exists in project root
+- Verify `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` are set
+- Restart dev server after changing `.env`
 
 ### Images not uploading?
-- Check Cloudinary credentials in `.env`
-- Verify upload preset is **unsigned** (not signed)
+- Check Storage bucket `designs` exists and is public
+- Verify you're logged in as admin (uploads require auth)
 - Check browser console for errors
 
-### Can't connect to backend?
-- Verify backend is running and accessible
-- Check CORS settings in `backend/server.js`
-- Ensure VITE_API_URL is correct (no trailing slash)
+### Can't login to admin?
+- Verify user exists in Supabase → Authentication → Users
+- Make sure "Auto Confirm User" was checked
+- Try resetting password in Supabase dashboard
 
-### Admin login not working?
-- Check ADMIN_PASSWORD in backend `.env`
-- Restart backend after changing password
-- Clear browser localStorage and try again
-
----
-
-## 📞 Support
-
-For issues or questions:
-- Check the backend logs (Render dashboard or terminal)
-- Check browser console for frontend errors
-- Verify all environment variables are set correctly
+### Blank page after deploy?
+- Ensure `base: './'` is in `vite.config.js`
+- Use `HashRouter` (already configured)
+- Check `.env` values are included in build
 
 ---
 
 ## 🎨 Customization
 
-### Change Colors:
-Edit `src/index.css` - update the color variables in `@theme`
+### Change colors
+Edit `src/index.css` → `@theme` section
 
-### Change Fonts:
-Edit `index.html` - update Google Fonts link
-Edit `src/index.css` - update `--font-serif` and `--font-sans`
+### Change fonts
+Edit `index.html` → Google Fonts link
+Edit `src/index.css` → `--font-serif` and `--font-sans`
 
-### Add New Pages:
+### Add new pages
 1. Create component in `src/pages/`
 2. Add route in `src/App.tsx`
-3. Add navigation link in `src/components/Layout.tsx`
+3. Add link in `src/components/Layout.tsx`
 
 ---
 
-## 📝 Environment Variables Reference
+## ✅ Checklist
 
-### Frontend (.env):
-```
-VITE_API_URL=https://your-api.onrender.com/api
-VITE_CLOUDINARY_CLOUD_NAME=your_cloud_name
-VITE_CLOUDINARY_UPLOAD_PRESET=mimiko-studio
-```
-
-### Backend (backend/.env):
-```
-DATABASE_URL=postgresql://...
-ADMIN_PASSWORD=your_password
-JWT_SECRET=random_string
-CLOUDINARY_CLOUD_NAME=your_cloud_name
-CLOUDINARY_API_KEY=your_api_key
-CLOUDINARY_API_SECRET=your_api_secret
-PORT=3001
-```
+- [ ] Supabase project created
+- [ ] SQL schema run successfully
+- [ ] Storage bucket `designs` exists
+- [ ] Admin user created in Authentication
+- [ ] `.env` file configured
+- [ ] `npm run dev` works locally
+- [ ] Can login to /#/admin
+- [ ] Can add a design with images
+- [ ] Can submit a booking (test as customer)
+- [ ] Deployed to GitHub Pages / Netlify / Vercel
 
 ---
 
-## ✅ You're All Set!
+## 🎉 You're Live!
 
-Your Mimiko Studio website is ready to go live. Customers can browse designs and submit inquiries, while you manage everything from the admin panel.
+Your complete in-house jewellery studio website is ready. Customers browse and book, you manage everything from the admin panel — all powered by a single Supabase project.
 
-**Next Steps:**
-1. Deploy backend to Render
-2. Configure frontend `.env` with your API URL
-3. Build and deploy frontend
-4. Login to admin and add your first design
-5. Share your site! 🎉
+**No backend server. No separate database. No Cloudinary. Just Supabase.**
+
+Share your site and start taking bookings! 🎊

@@ -9,9 +9,7 @@ export default function MessagesManager() {
   useEffect(() => { loadMessages(); }, []);
 
   const loadMessages = async () => {
-    const token = localStorage.getItem('adminToken');
-    if (!token) return;
-    const res = await contactApi.getAll(token);
+    const res = await contactApi.getAll();
     if (res.success) setMessages(res.data!);
     setLoading(false);
   };

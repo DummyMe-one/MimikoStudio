@@ -1,25 +1,16 @@
 import { useState, useEffect, useRef } from 'react';
-import { Plus, Edit2, Trash2, X, Upload, Image as ImageIcon } from 'lucide-react';
-import { designsApi, collectionsApi } from '../../services/api';
+import { Plus, Edit2, Trash2, X, Upload } from 'lucide-react';
+import { designsApi, collectionsApi, uploadApi } from '../../services/api';
 import { designs as localDesigns, collections as localCollections } from '../../data';
+import { isSupabaseConfigured } from '../../lib/supabase';
 
 interface DesignForm {
-  name: string;
-  slug: string;
-  description: string;
-  longDescription: string;
-  collectionId: string;
-  category: string;
-  price: string;
+  name: string; slug: string; description: string; longDescription: string;
+  collectionId: string; category: string; price: string;
   priceType: 'fixed' | 'starting' | 'on-request';
   availability: 'available' | 'made-to-order' | 'sold';
-  customizable: boolean;
-  featured: boolean;
-  material: string;
-  craft: string;
-  occasion: string;
-  care: string;
-  tags: string;
+  customizable: boolean; featured: boolean;
+  material: string; craft: string; occasion: string; care: string; tags: string;
   images: { url: string; alt: string; isPrimary?: boolean }[];
 }
 
@@ -27,8 +18,7 @@ const emptyForm: DesignForm = {
   name: '', slug: '', description: '', longDescription: '',
   collectionId: '', category: '', price: '', priceType: 'starting',
   availability: 'made-to-order', customizable: true, featured: false,
-  material: '', craft: '', occasion: '', care: '', tags: '',
-  images: [],
+  material: '', craft: '', occasion: '', care: '', tags: '', images: [],
 };
 
 export default function DesignsManager() {
@@ -45,7 +35,6 @@ export default function DesignsManager() {
   useEffect(() => { loadData(); }, []);
 
   const loadData = async () => {
-    const token = localStorage.getItem('adminToken');
     const [designsRes, collectionsRes] = await Promise.all([
       designsApi.getAll(),
       collectionsApi.getAll(),
@@ -60,38 +49,20 @@ export default function DesignsManager() {
     if (!files) return;
     setUploading(true);
 
-    const cloudName = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME;
-    const uploadPreset = import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET;
-
-    if (!cloudName || !uploadPreset) {
-      // Fallback: use local object URLs for demo
-      const newImages = Array.from(files).map((file) => ({
-        url: URL.createObjectURL(file),
-        alt: file.name,
-        isPrimary: form.images.length === 0,
-      }));
-      setForm({ ...form, images: [...form.images, ...newImages] });
-      setUploading(false);
-      return;
-    }
-
     try {
-      const uploaded = await Promise.all(
-        Array.from(files).map(async (file) => {
-          const formData = new FormData();
-          formData.append('file', file);
-          formData.append('upload_preset', uploadPreset);
-          const res = await fetch(
-            `https://api.cloudinary.com/v1_1/${cloudName}/image/upload`,
-            { method: 'POST', body: formData }
-          );
-          const data = await res.json();
-          return { url: data.secure_url, alt: file.name, isPrimary: form.images.length === 0 };
-        })
-      );
-      setForm({ ...form, images: [...form.images, ...uploaded] });
+      const result = await uploadApi.uploadMultiple(files);
+      if (result.success) {
+        const newImages = result.urls.map((url, idx) => ({
+          url,
+          alt: `Image ${form.images.length + idx + 1}`,
+          isPrimary: form.images.length === 0 && idx === 0,
+        }));
+        setForm({ ...form, images: [...form.images, ...newImages] });
+      } else {
+        alert(result.error || 'Upload failed');
+      }
     } catch (err) {
-      alert('Image upload failed. Check Cloudinary configuration.');
+      alert('Image upload failed');
     } finally {
       setUploading(false);
       if (fileInputRef.current) fileInputRef.current.value = '';
@@ -114,8 +85,6 @@ export default function DesignsManager() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const token = localStorage.getItem('adminToken');
-    if (!token) return;
     setSaving(true);
 
     const payload = {
@@ -130,24 +99,16 @@ export default function DesignsManager() {
 
     try {
       if (editingId) {
-        const res = await designsApi.update(editingId, payload, token);
-        if (res.success) {
-          await loadData();
-          closeForm();
-        } else {
-          alert(res.error || 'Failed to update design');
-        }
+        const res = await designsApi.update(editingId, payload);
+        if (res.success) { await loadData(); closeForm(); }
+        else alert(res.error || 'Failed to update');
       } else {
-        const res = await designsApi.create(payload, token);
-        if (res.success) {
-          await loadData();
-          closeForm();
-        } else {
-          alert(res.error || 'Failed to create design');
-        }
+        const res = await designsApi.create(payload);
+        if (res.success) { await loadData(); closeForm(); }
+        else alert(res.error || 'Failed to create');
       }
     } catch (err) {
-      alert('Error saving design. Check your backend connection.');
+      alert('Error saving design');
     } finally {
       setSaving(false);
     }
@@ -158,11 +119,11 @@ export default function DesignsManager() {
       name: design.name || '',
       slug: design.slug || '',
       description: design.description || '',
-      longDescription: design.longDescription || '',
-      collectionId: design.collectionId || '',
+      longDescription: design.longDescription || design.long_description || '',
+      collectionId: design.collectionId || design.collection_id || '',
       category: design.category || '',
       price: design.price || '',
-      priceType: design.priceType || 'starting',
+      priceType: design.priceType || design.price_type || 'starting',
       availability: design.availability || 'made-to-order',
       customizable: design.customizable ?? true,
       featured: design.featured ?? false,
@@ -170,7 +131,7 @@ export default function DesignsManager() {
       craft: design.craft || '',
       occasion: design.occasion || '',
       care: design.care || '',
-      tags: (design.tags || []).join(', '),
+      tags: Array.isArray(design.tags) ? design.tags.join(', ') : (design.tags || ''),
       images: design.images || [],
     });
     setEditingId(design.id);
@@ -179,14 +140,9 @@ export default function DesignsManager() {
 
   const handleDelete = async (id: string) => {
     if (!confirm('Are you sure you want to delete this design?')) return;
-    const token = localStorage.getItem('adminToken');
-    if (!token) return;
-    const res = await designsApi.delete(id, token);
-    if (res.success) {
-      await loadData();
-    } else {
-      alert(res.error || 'Failed to delete');
-    }
+    const res = await designsApi.delete(id);
+    if (res.success) await loadData();
+    else alert(res.error || 'Failed to delete');
   };
 
   const closeForm = () => {
@@ -195,9 +151,7 @@ export default function DesignsManager() {
     setForm(emptyForm);
   };
 
-  if (loading) {
-    return <div className="py-20 text-center text-taupe">Loading designs...</div>;
-  }
+  if (loading) return <div className="py-20 text-center text-taupe">Loading designs...</div>;
 
   return (
     <div>
@@ -206,16 +160,19 @@ export default function DesignsManager() {
           <h1 className="heading-serif text-3xl font-semibold text-espresso">Designs</h1>
           <p className="text-taupe text-sm">{designs.length} designs in your catalog</p>
         </div>
-        <button
-          onClick={() => setShowForm(true)}
-          className="flex items-center gap-2 bg-espresso text-ivory px-4 py-2.5 text-sm font-sans font-medium hover:bg-espresso/90 transition-colors"
-        >
-          <Plus size={16} />
-          Add Design
+        <button onClick={() => setShowForm(true)}
+          className="flex items-center gap-2 bg-espresso text-ivory px-4 py-2.5 text-sm font-sans font-medium hover:bg-espresso/90 transition-colors">
+          <Plus size={16} /> Add Design
         </button>
       </div>
 
-      {/* Designs List */}
+      {!isSupabaseConfigured() && (
+        <div className="mb-6 p-4 bg-amber-50 border border-amber-200 text-sm text-amber-800">
+          <p className="font-medium">⚠️ Supabase not configured</p>
+          <p className="text-xs mt-1">Showing sample data. Configure Supabase to manage your own designs.</p>
+        </div>
+      )}
+
       <div className="bg-white border border-champagne/30">
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
@@ -231,7 +188,7 @@ export default function DesignsManager() {
             </thead>
             <tbody className="divide-y divide-champagne/20">
               {designs.map((design) => {
-                const col = collections.find((c) => c.id === design.collectionId);
+                const col = collections.find((c) => c.id === (design.collectionId || design.collection_id));
                 return (
                   <tr key={design.id} className="hover:bg-cream/20 transition-colors">
                     <td className="px-4 py-3">
@@ -262,25 +219,12 @@ export default function DesignsManager() {
                         {design.availability === 'available' ? 'In Stock' :
                          design.availability === 'made-to-order' ? 'Made to Order' : 'Sold'}
                       </span>
-                      {design.featured && (
-                        <span className="ml-1 text-xs px-2 py-1 rounded-full bg-champagne/30 text-espresso">
-                          Featured
-                        </span>
-                      )}
                     </td>
                     <td className="px-4 py-3 text-right">
-                      <button
-                        onClick={() => handleEdit(design)}
-                        className="p-2 text-taupe hover:text-espresso transition-colors"
-                        title="Edit"
-                      >
+                      <button onClick={() => handleEdit(design)} className="p-2 text-taupe hover:text-espresso transition-colors" title="Edit">
                         <Edit2 size={16} />
                       </button>
-                      <button
-                        onClick={() => handleDelete(design.id)}
-                        className="p-2 text-taupe hover:text-red-600 transition-colors"
-                        title="Delete"
-                      >
+                      <button onClick={() => handleDelete(design.id)} className="p-2 text-taupe hover:text-red-600 transition-colors" title="Delete">
                         <Trash2 size={16} />
                       </button>
                     </td>
@@ -291,13 +235,11 @@ export default function DesignsManager() {
           </table>
         </div>
         {designs.length === 0 && (
-          <div className="p-8 text-center text-taupe">
-            No designs yet. Click "Add Design" to create your first product.
-          </div>
+          <div className="p-8 text-center text-taupe">No designs yet. Click "Add Design" to create your first product.</div>
         )}
       </div>
 
-      {/* Design Form Modal */}
+      {/* Form Modal */}
       {showForm && (
         <div className="fixed inset-0 z-50 flex items-start justify-center p-4 pt-10 overflow-y-auto">
           <div className="absolute inset-0 bg-espresso/50" onClick={closeForm} />
@@ -305,107 +247,62 @@ export default function DesignsManager() {
             <button onClick={closeForm} className="absolute top-4 right-4 text-taupe hover:text-espresso">
               <X size={20} />
             </button>
-
             <h2 className="heading-serif text-2xl font-semibold text-espresso mb-6">
               {editingId ? 'Edit Design' : 'Add New Design'}
             </h2>
-
             <form onSubmit={handleSubmit} className="space-y-6">
-              {/* Basic Info */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-xs uppercase tracking-wider text-taupe font-sans mb-1.5">Name *</label>
-                  <input
-                    type="text"
-                    value={form.name}
+                  <input type="text" value={form.name}
                     onChange={(e) => setForm({ ...form, name: e.target.value, slug: generateSlug(e.target.value) })}
-                    className="w-full border border-champagne bg-white px-4 py-2.5 text-sm text-espresso rounded-sm focus:border-light-gold focus:outline-none"
-                    required
-                  />
+                    className="w-full border border-champagne bg-white px-4 py-2.5 text-sm text-espresso rounded-sm focus:border-light-gold focus:outline-none" required />
                 </div>
                 <div>
                   <label className="block text-xs uppercase tracking-wider text-taupe font-sans mb-1.5">Slug</label>
-                  <input
-                    type="text"
-                    value={form.slug}
-                    onChange={(e) => setForm({ ...form, slug: e.target.value })}
-                    className="w-full border border-champagne bg-white px-4 py-2.5 text-sm text-espresso rounded-sm focus:border-light-gold focus:outline-none"
-                    placeholder="auto-generated"
-                  />
+                  <input type="text" value={form.slug} onChange={(e) => setForm({ ...form, slug: e.target.value })}
+                    className="w-full border border-champagne bg-white px-4 py-2.5 text-sm text-espresso rounded-sm focus:border-light-gold focus:outline-none" />
                 </div>
               </div>
-
               <div>
                 <label className="block text-xs uppercase tracking-wider text-taupe font-sans mb-1.5">Short Description *</label>
-                <textarea
-                  value={form.description}
-                  onChange={(e) => setForm({ ...form, description: e.target.value })}
-                  rows={2}
-                  className="w-full border border-champagne bg-white px-4 py-2.5 text-sm text-espresso rounded-sm focus:border-light-gold focus:outline-none resize-none"
-                  required
-                />
+                <textarea value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} rows={2}
+                  className="w-full border border-champagne bg-white px-4 py-2.5 text-sm text-espresso rounded-sm focus:border-light-gold focus:outline-none resize-none" required />
               </div>
-
               <div>
                 <label className="block text-xs uppercase tracking-wider text-taupe font-sans mb-1.5">Long Description</label>
-                <textarea
-                  value={form.longDescription}
-                  onChange={(e) => setForm({ ...form, longDescription: e.target.value })}
-                  rows={3}
-                  className="w-full border border-champagne bg-white px-4 py-2.5 text-sm text-espresso rounded-sm focus:border-light-gold focus:outline-none resize-none"
-                />
+                <textarea value={form.longDescription} onChange={(e) => setForm({ ...form, longDescription: e.target.value })} rows={3}
+                  className="w-full border border-champagne bg-white px-4 py-2.5 text-sm text-espresso rounded-sm focus:border-light-gold focus:outline-none resize-none" />
               </div>
-
-              {/* Collection & Category */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-xs uppercase tracking-wider text-taupe font-sans mb-1.5">Collection *</label>
-                  <select
-                    value={form.collectionId}
-                    onChange={(e) => setForm({ ...form, collectionId: e.target.value })}
-                    className="w-full border border-champagne bg-white px-4 py-2.5 text-sm text-espresso rounded-sm focus:border-light-gold focus:outline-none"
-                    required
-                  >
+                  <select value={form.collectionId} onChange={(e) => setForm({ ...form, collectionId: e.target.value })}
+                    className="w-full border border-champagne bg-white px-4 py-2.5 text-sm text-espresso rounded-sm focus:border-light-gold focus:outline-none" required>
                     <option value="">Select collection</option>
-                    {collections.map((c) => (
-                      <option key={c.id} value={c.id}>{c.name}</option>
-                    ))}
+                    {collections.map((c) => (<option key={c.id} value={c.id}>{c.name}</option>))}
                   </select>
                 </div>
                 <div>
                   <label className="block text-xs uppercase tracking-wider text-taupe font-sans mb-1.5">Category *</label>
-                  <input
-                    type="text"
-                    value={form.category}
-                    onChange={(e) => setForm({ ...form, category: e.target.value })}
+                  <input type="text" value={form.category} onChange={(e) => setForm({ ...form, category: e.target.value })}
                     placeholder="Earrings, Necklace, Bag..."
-                    className="w-full border border-champagne bg-white px-4 py-2.5 text-sm text-espresso rounded-sm focus:border-light-gold focus:outline-none"
-                    required
-                  />
+                    className="w-full border border-champagne bg-white px-4 py-2.5 text-sm text-espresso rounded-sm focus:border-light-gold focus:outline-none" required />
                 </div>
               </div>
 
-              {/* Pricing */}
               <div className="border-t border-champagne/50 pt-5">
                 <h3 className="text-xs uppercase tracking-widest text-light-gold font-sans font-medium mb-4">Pricing & Availability</h3>
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                   <div>
                     <label className="block text-xs uppercase tracking-wider text-taupe font-sans mb-1.5">Price</label>
-                    <input
-                      type="text"
-                      value={form.price}
-                      onChange={(e) => setForm({ ...form, price: e.target.value })}
-                      placeholder="₹2,500"
-                      className="w-full border border-champagne bg-white px-4 py-2.5 text-sm text-espresso rounded-sm focus:border-light-gold focus:outline-none"
-                    />
+                    <input type="text" value={form.price} onChange={(e) => setForm({ ...form, price: e.target.value })} placeholder="₹2,500"
+                      className="w-full border border-champagne bg-white px-4 py-2.5 text-sm text-espresso rounded-sm focus:border-light-gold focus:outline-none" />
                   </div>
                   <div>
                     <label className="block text-xs uppercase tracking-wider text-taupe font-sans mb-1.5">Price Type</label>
-                    <select
-                      value={form.priceType}
-                      onChange={(e) => setForm({ ...form, priceType: e.target.value as any })}
-                      className="w-full border border-champagne bg-white px-4 py-2.5 text-sm text-espresso rounded-sm focus:border-light-gold focus:outline-none"
-                    >
+                    <select value={form.priceType} onChange={(e) => setForm({ ...form, priceType: e.target.value as any })}
+                      className="w-full border border-champagne bg-white px-4 py-2.5 text-sm text-espresso rounded-sm focus:border-light-gold focus:outline-none">
                       <option value="fixed">Fixed Price</option>
                       <option value="starting">Starting From</option>
                       <option value="on-request">On Request</option>
@@ -413,153 +310,85 @@ export default function DesignsManager() {
                   </div>
                   <div>
                     <label className="block text-xs uppercase tracking-wider text-taupe font-sans mb-1.5">Availability</label>
-                    <select
-                      value={form.availability}
-                      onChange={(e) => setForm({ ...form, availability: e.target.value as any })}
-                      className="w-full border border-champagne bg-white px-4 py-2.5 text-sm text-espresso rounded-sm focus:border-light-gold focus:outline-none"
-                    >
+                    <select value={form.availability} onChange={(e) => setForm({ ...form, availability: e.target.value as any })}
+                      className="w-full border border-champagne bg-white px-4 py-2.5 text-sm text-espresso rounded-sm focus:border-light-gold focus:outline-none">
                       <option value="available">In Stock</option>
                       <option value="made-to-order">Made to Order</option>
                       <option value="sold">Sold</option>
                     </select>
                   </div>
                 </div>
-
                 <div className="flex gap-6 mt-4">
                   <label className="flex items-center gap-2 text-sm text-espresso cursor-pointer">
-                    <input
-                      type="checkbox"
-                      checked={form.customizable}
-                      onChange={(e) => setForm({ ...form, customizable: e.target.checked })}
-                      className="accent-muted-gold"
-                    />
+                    <input type="checkbox" checked={form.customizable} onChange={(e) => setForm({ ...form, customizable: e.target.checked })} className="accent-muted-gold" />
                     Customizable
                   </label>
                   <label className="flex items-center gap-2 text-sm text-espresso cursor-pointer">
-                    <input
-                      type="checkbox"
-                      checked={form.featured}
-                      onChange={(e) => setForm({ ...form, featured: e.target.checked })}
-                      className="accent-muted-gold"
-                    />
+                    <input type="checkbox" checked={form.featured} onChange={(e) => setForm({ ...form, featured: e.target.checked })} className="accent-muted-gold" />
                     Featured on Homepage
                   </label>
                 </div>
               </div>
 
-              {/* Details */}
               <div className="border-t border-champagne/50 pt-5">
                 <h3 className="text-xs uppercase tracking-widest text-light-gold font-sans font-medium mb-4">Details</h3>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-xs uppercase tracking-wider text-taupe font-sans mb-1.5">Material</label>
+                  <div><label className="block text-xs uppercase tracking-wider text-taupe font-sans mb-1.5">Material</label>
                     <input type="text" value={form.material} onChange={(e) => setForm({ ...form, material: e.target.value })}
-                      className="w-full border border-champagne bg-white px-4 py-2.5 text-sm text-espresso rounded-sm focus:border-light-gold focus:outline-none" />
-                  </div>
-                  <div>
-                    <label className="block text-xs uppercase tracking-wider text-taupe font-sans mb-1.5">Craft</label>
+                      className="w-full border border-champagne bg-white px-4 py-2.5 text-sm text-espresso rounded-sm focus:border-light-gold focus:outline-none" /></div>
+                  <div><label className="block text-xs uppercase tracking-wider text-taupe font-sans mb-1.5">Craft</label>
                     <input type="text" value={form.craft} onChange={(e) => setForm({ ...form, craft: e.target.value })}
-                      className="w-full border border-champagne bg-white px-4 py-2.5 text-sm text-espresso rounded-sm focus:border-light-gold focus:outline-none" />
-                  </div>
-                  <div>
-                    <label className="block text-xs uppercase tracking-wider text-taupe font-sans mb-1.5">Occasion</label>
+                      className="w-full border border-champagne bg-white px-4 py-2.5 text-sm text-espresso rounded-sm focus:border-light-gold focus:outline-none" /></div>
+                  <div><label className="block text-xs uppercase tracking-wider text-taupe font-sans mb-1.5">Occasion</label>
                     <input type="text" value={form.occasion} onChange={(e) => setForm({ ...form, occasion: e.target.value })}
-                      className="w-full border border-champagne bg-white px-4 py-2.5 text-sm text-espresso rounded-sm focus:border-light-gold focus:outline-none" />
-                  </div>
-                  <div>
-                    <label className="block text-xs uppercase tracking-wider text-taupe font-sans mb-1.5">Care Instructions</label>
+                      className="w-full border border-champagne bg-white px-4 py-2.5 text-sm text-espresso rounded-sm focus:border-light-gold focus:outline-none" /></div>
+                  <div><label className="block text-xs uppercase tracking-wider text-taupe font-sans mb-1.5">Care</label>
                     <input type="text" value={form.care} onChange={(e) => setForm({ ...form, care: e.target.value })}
-                      className="w-full border border-champagne bg-white px-4 py-2.5 text-sm text-espresso rounded-sm focus:border-light-gold focus:outline-none" />
-                  </div>
+                      className="w-full border border-champagne bg-white px-4 py-2.5 text-sm text-espresso rounded-sm focus:border-light-gold focus:outline-none" /></div>
                 </div>
                 <div className="mt-4">
                   <label className="block text-xs uppercase tracking-wider text-taupe font-sans mb-1.5">Tags (comma-separated)</label>
-                  <input type="text" value={form.tags} onChange={(e) => setForm({ ...form, tags: e.target.value })}
-                    placeholder="earrings, pearl, festive"
+                  <input type="text" value={form.tags} onChange={(e) => setForm({ ...form, tags: e.target.value })} placeholder="earrings, pearl, festive"
                     className="w-full border border-champagne bg-white px-4 py-2.5 text-sm text-espresso rounded-sm focus:border-light-gold focus:outline-none" />
                 </div>
               </div>
 
-              {/* Images */}
               <div className="border-t border-champagne/50 pt-5">
-                <h3 className="text-xs uppercase tracking-widest text-light-gold font-sans font-medium mb-4">
-                  Images ({form.images.length})
-                </h3>
-
+                <h3 className="text-xs uppercase tracking-widest text-light-gold font-sans font-medium mb-4">Images ({form.images.length})</h3>
                 <div className="grid grid-cols-3 sm:grid-cols-4 gap-3 mb-4">
                   {form.images.map((img, idx) => (
                     <div key={idx} className="relative aspect-square bg-cream overflow-hidden group">
                       <img src={img.url} alt={img.alt} className="w-full h-full object-cover" />
                       {img.isPrimary && (
-                        <span className="absolute top-1 left-1 bg-light-gold text-espresso text-[10px] px-1.5 py-0.5">
-                          Primary
-                        </span>
+                        <span className="absolute top-1 left-1 bg-light-gold text-espresso text-[10px] px-1.5 py-0.5">Primary</span>
                       )}
                       <div className="absolute inset-0 bg-espresso/0 group-hover:bg-espresso/40 transition-colors flex items-center justify-center gap-1 opacity-0 group-hover:opacity-100">
                         {!img.isPrimary && (
-                          <button
-                            type="button"
-                            onClick={() => setPrimaryImage(idx)}
-                            className="bg-white p-1 rounded text-espresso text-[10px]"
-                            title="Set as primary"
-                          >
-                            ★
-                          </button>
+                          <button type="button" onClick={() => setPrimaryImage(idx)} className="bg-white p-1 rounded text-espresso text-[10px]" title="Set as primary">★</button>
                         )}
-                        <button
-                          type="button"
-                          onClick={() => removeImage(idx)}
-                          className="bg-white p-1 rounded text-red-600"
-                          title="Remove"
-                        >
-                          <X size={12} />
-                        </button>
+                        <button type="button" onClick={() => removeImage(idx)} className="bg-white p-1 rounded text-red-600" title="Remove"><X size={12} /></button>
                       </div>
                     </div>
                   ))}
-
-                  {/* Upload Button */}
                   <label className="aspect-square bg-cream border-2 border-dashed border-champagne flex flex-col items-center justify-center cursor-pointer hover:border-light-gold transition-colors">
                     {uploading ? (
                       <span className="text-xs text-taupe">Uploading...</span>
                     ) : (
-                      <>
-                        <Upload size={20} className="text-taupe mb-1" />
-                        <span className="text-xs text-taupe">Upload</span>
-                      </>
+                      <><Upload size={20} className="text-taupe mb-1" /><span className="text-xs text-taupe">Upload</span></>
                     )}
-                    <input
-                      ref={fileInputRef}
-                      type="file"
-                      accept="image/*"
-                      multiple
-                      onChange={handleImageUpload}
-                      className="hidden"
-                    />
+                    <input ref={fileInputRef} type="file" accept="image/*" multiple onChange={handleImageUpload} className="hidden" />
                   </label>
                 </div>
-
                 <p className="text-xs text-taupe">
-                  {!import.meta.env.VITE_CLOUDINARY_CLOUD_NAME
-                    ? '⚠️ Cloudinary not configured. Images will be stored as local previews only. Set VITE_CLOUDINARY_CLOUD_NAME and VITE_CLOUDINARY_UPLOAD_PRESET for persistent uploads.'
-                    : '✓ Images will be uploaded to Cloudinary'}
+                  {isSupabaseConfigured() ? '✓ Images will be uploaded to Supabase Storage' : '⚠️ Supabase not configured - images will be local previews only'}
                 </p>
               </div>
 
-              {/* Submit */}
               <div className="flex gap-3 pt-4 border-t border-champagne/50">
-                <button
-                  type="button"
-                  onClick={closeForm}
-                  className="flex-1 border border-champagne text-espresso py-3 text-sm font-sans font-medium hover:bg-cream transition-colors"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  disabled={saving}
-                  className="flex-1 bg-espresso text-ivory py-3 text-sm font-sans font-medium hover:bg-espresso/90 transition-colors disabled:opacity-50"
-                >
+                <button type="button" onClick={closeForm}
+                  className="flex-1 border border-champagne text-espresso py-3 text-sm font-sans font-medium hover:bg-cream transition-colors">Cancel</button>
+                <button type="submit" disabled={saving}
+                  className="flex-1 bg-espresso text-ivory py-3 text-sm font-sans font-medium hover:bg-espresso/90 transition-colors disabled:opacity-50">
                   {saving ? 'Saving...' : editingId ? 'Update Design' : 'Create Design'}
                 </button>
               </div>

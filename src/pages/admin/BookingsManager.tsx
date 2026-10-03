@@ -13,25 +13,19 @@ export default function BookingsManager() {
   useEffect(() => { loadBookings(); }, []);
 
   const loadBookings = async () => {
-    const token = localStorage.getItem('adminToken');
-    if (!token) return;
-    const res = await bookingsApi.getAll(token);
+    const res = await bookingsApi.getAll();
     if (res.success) setBookings(res.data!);
     setLoading(false);
   };
 
   const updateStatus = async (id: string, status: string) => {
-    const token = localStorage.getItem('adminToken');
-    if (!token) return;
-    const res = await bookingsApi.updateStatus(id, status, token);
+    const res = await bookingsApi.updateStatus(id, status);
     if (res.success) await loadBookings();
   };
 
   const deleteBooking = async (id: string) => {
     if (!confirm('Delete this booking?')) return;
-    const token = localStorage.getItem('adminToken');
-    if (!token) return;
-    const res = await bookingsApi.delete(id, token);
+    const res = await bookingsApi.delete(id);
     if (res.success) await loadBookings();
   };
 
