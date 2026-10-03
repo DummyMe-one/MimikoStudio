@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { ArrowRight, Truck, Shield, Headphones, CreditCard, Star, ChevronRight } from 'lucide-react';
+import { ArrowRight, Truck, Shield, Headphones, CreditCard, Star, ChevronRight, Zap, Award, Users } from 'lucide-react';
 import ScrollReveal from '../components/ScrollReveal';
 import { useProducts, useCategories } from '../hooks/useElectronicsData';
 
@@ -9,12 +9,11 @@ export default function ElectronicsHome() {
 
   const featuredProducts = products.filter(p => p.featured).slice(0, 8);
   const newArrivals = products.filter(p => p.newArrival).slice(0, 4);
-  const popularProducts = products.filter(p => p.popular).slice(0, 4);
 
   return (
     <div className="bg-background">
-      {/* Hero Banner */}
-      <section className="relative bg-gradient-to-br from-primary via-primary-dark to-primary overflow-hidden">
+      {/* Hero Section */}
+      <section className="relative gradient-primary overflow-hidden">
         <div className="absolute inset-0 opacity-10">
           <div className="absolute inset-0" style={{
             backgroundImage: 'radial-gradient(circle at 2px 2px, white 1px, transparent 0)',
@@ -22,13 +21,13 @@ export default function ElectronicsHome() {
           }} />
         </div>
         
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 lg:py-24 relative">
+        <div className="container relative py-16 lg:py-24">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             <ScrollReveal direction="left">
               <div>
-                <div className="inline-flex items-center gap-2 bg-white/20 backdrop-blur-sm px-4 py-2 rounded-full text-white text-sm font-medium mb-6">
-                  <span className="w-2 h-2 bg-accent rounded-full animate-pulse" />
-                  Festival Sale Live Now
+                <div className="inline-flex items-center gap-2 bg-white/20 backdrop-blur-sm px-4 py-2 rounded-full text-white text-sm font-semibold mb-6">
+                  <Zap size={16} className="text-accent" />
+                  <span>Festival Sale Live Now</span>
                 </div>
                 
                 <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white leading-tight mb-6">
@@ -43,14 +42,15 @@ export default function ElectronicsHome() {
                 <div className="flex flex-wrap gap-4">
                   <Link
                     to="/products"
-                    className="inline-flex items-center gap-2 bg-accent text-white px-8 py-4 rounded-lg font-semibold hover:bg-accent-dark transition-all hover:scale-105 shadow-lg"
+                    className="btn btn-accent"
                   >
                     Explore Products
                     <ArrowRight size={20} />
                   </Link>
                   <Link
                     to="/offers"
-                    className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm text-white px-8 py-4 rounded-lg font-semibold hover:bg-white/20 transition-all border border-white/30"
+                    className="btn btn-secondary"
+                    style={{ background: 'rgba(255,255,255,0.1)', color: 'white', borderColor: 'rgba(255,255,255,0.3)' }}
                   >
                     View Offers
                   </Link>
@@ -69,10 +69,10 @@ export default function ElectronicsHome() {
                 </div>
                 
                 {/* Floating badges */}
-                <div className="absolute -top-4 -right-4 bg-accent text-white px-6 py-3 rounded-full font-bold shadow-xl">
+                <div className="absolute -top-4 -right-4 bg-accent text-white px-6 py-3 rounded-full font-bold shadow-2xl">
                   Up to 40% OFF
                 </div>
-                <div className="absolute -bottom-4 -left-4 bg-white text-primary px-6 py-3 rounded-full font-bold shadow-xl">
+                <div className="absolute -bottom-4 -left-4 bg-white text-primary px-6 py-3 rounded-full font-bold shadow-2xl">
                   EMI Available
                 </div>
               </div>
@@ -82,8 +82,8 @@ export default function ElectronicsHome() {
       </section>
 
       {/* Category Showcase */}
-      <section className="py-16 lg:py-20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <section className="section">
+        <div className="container">
           <ScrollReveal>
             <div className="text-center mb-12">
               <h2 className="text-3xl lg:text-4xl font-bold text-text mb-4">
@@ -100,7 +100,7 @@ export default function ElectronicsHome() {
               <ScrollReveal key={category.id} delay={idx * 0.1}>
                 <Link
                   to={`/categories/${category.slug}`}
-                  className="group block bg-surface rounded-xl p-6 text-center hover:shadow-xl transition-all hover:-translate-y-1 border border-border"
+                  className="group block bg-white rounded-xl p-6 text-center hover:shadow-xl transition-all hover:-translate-y-1 border border-border"
                 >
                   <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:bg-primary group-hover:scale-110 transition-all">
                     <span className="text-3xl">📱</span>
@@ -116,8 +116,8 @@ export default function ElectronicsHome() {
       </section>
 
       {/* Featured Products */}
-      <section className="py-16 lg:py-20 bg-surface">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <section className="section bg-white">
+        <div className="container">
           <ScrollReveal>
             <div className="flex items-center justify-between mb-12">
               <div>
@@ -142,27 +142,26 @@ export default function ElectronicsHome() {
               <ScrollReveal key={product.id} delay={idx * 0.1}>
                 <Link
                   to={`/products/${product.slug}`}
-                  className="group block bg-background rounded-xl overflow-hidden hover:shadow-xl transition-all border border-border"
+                  className="product-card group"
                 >
-                  <div className="aspect-square bg-surface relative overflow-hidden">
+                  <div className="product-card-image">
                     <img
                       src={product.images?.[0]?.imageUrl || 'https://images.unsplash.com/photo-1593642632823-8f785ba67e45?w=400&q=80'}
                       alt={product.name}
-                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                     />
                     {product.newArrival && (
-                      <span className="absolute top-3 left-3 bg-success text-white px-3 py-1 rounded-full text-xs font-bold">
+                      <span className="absolute top-3 left-3 badge badge-success">
                         NEW
                       </span>
                     )}
                     {product.popular && (
-                      <span className="absolute top-3 right-3 bg-accent text-white px-3 py-1 rounded-full text-xs font-bold">
+                      <span className="absolute top-3 right-3 badge badge-accent">
                         POPULAR
                       </span>
                     )}
                   </div>
                   <div className="p-4">
-                    <p className="text-xs text-text-secondary font-medium mb-1">
+                    <p className="text-xs text-text-secondary font-semibold mb-1">
                       {product.brand?.name || 'Brand'}
                     </p>
                     <h3 className="font-semibold text-text mb-2 line-clamp-2 group-hover:text-primary transition-colors">
@@ -171,15 +170,15 @@ export default function ElectronicsHome() {
                     <div className="flex items-center gap-2 mb-3">
                       <div className="flex items-center gap-1">
                         <Star size={14} className="fill-accent text-accent" />
-                        <span className="text-sm font-medium text-text">{product.rating || '4.5'}</span>
+                        <span className="text-sm font-semibold text-text">{product.rating || '4.5'}</span>
                       </div>
                     </div>
                     <div className="flex items-baseline gap-2">
-                      <span className="text-xl font-bold text-primary">
+                      <span className="price">
                         ₹{(product.sellingPrice || 0).toLocaleString()}
                       </span>
                       {product.mrp && product.mrp > (product.sellingPrice || 0) && (
-                        <span className="text-sm text-text-secondary line-through">
+                        <span className="price-original">
                           ₹{product.mrp.toLocaleString()}
                         </span>
                       )}
@@ -193,7 +192,7 @@ export default function ElectronicsHome() {
           <div className="mt-8 text-center md:hidden">
             <Link
               to="/products"
-              className="inline-flex items-center gap-2 bg-primary text-white px-8 py-3 rounded-lg font-semibold hover:bg-primary-dark transition-colors"
+              className="btn btn-primary"
             >
               View All Products <ArrowRight size={20} />
             </Link>
@@ -202,10 +201,10 @@ export default function ElectronicsHome() {
       </section>
 
       {/* Promotional Banner */}
-      <section className="py-16 lg:py-20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <section className="section">
+        <div className="container">
           <ScrollReveal>
-            <div className="relative bg-gradient-to-r from-accent to-accent-dark rounded-2xl overflow-hidden">
+            <div className="relative gradient-accent rounded-2xl overflow-hidden">
               <div className="absolute inset-0 opacity-10">
                 <div className="absolute inset-0" style={{
                   backgroundImage: 'radial-gradient(circle at 2px 2px, white 1px, transparent 0)',
@@ -215,7 +214,7 @@ export default function ElectronicsHome() {
               
               <div className="relative grid grid-cols-1 lg:grid-cols-2 gap-8 p-8 lg:p-12 items-center">
                 <div>
-                  <span className="inline-block bg-white/20 backdrop-blur-sm px-4 py-2 rounded-full text-white text-sm font-medium mb-4">
+                  <span className="inline-block bg-white/20 backdrop-blur-sm px-4 py-2 rounded-full text-white text-sm font-semibold mb-4">
                     🔥 Limited Time Offer
                   </span>
                   <h3 className="text-3xl lg:text-4xl font-bold text-white mb-4">
@@ -226,7 +225,8 @@ export default function ElectronicsHome() {
                   </p>
                   <Link
                     to="/offers"
-                    className="inline-flex items-center gap-2 bg-white text-accent px-8 py-4 rounded-lg font-semibold hover:bg-background transition-colors"
+                    className="btn"
+                    style={{ background: 'white', color: 'var(--color-accent)' }}
                   >
                     Shop Now <ArrowRight size={20} />
                   </Link>
@@ -247,8 +247,8 @@ export default function ElectronicsHome() {
       </section>
 
       {/* New Arrivals */}
-      <section className="py-16 lg:py-20 bg-surface">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <section className="section bg-white">
+        <div className="container">
           <ScrollReveal>
             <div className="flex items-center justify-between mb-12">
               <div>
@@ -273,28 +273,27 @@ export default function ElectronicsHome() {
               <ScrollReveal key={product.id} delay={idx * 0.1}>
                 <Link
                   to={`/products/${product.slug}`}
-                  className="group block bg-background rounded-xl overflow-hidden hover:shadow-xl transition-all border border-border"
+                  className="product-card group"
                 >
-                  <div className="aspect-square bg-surface relative overflow-hidden">
+                  <div className="product-card-image">
                     <img
                       src={product.images?.[0]?.imageUrl || 'https://images.unsplash.com/photo-1593642632823-8f785ba67e45?w=400&q=80'}
                       alt={product.name}
-                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                     />
-                    <span className="absolute top-3 left-3 bg-success text-white px-3 py-1 rounded-full text-xs font-bold">
+                    <span className="absolute top-3 left-3 badge badge-success">
                       NEW
                     </span>
                   </div>
                   <div className="p-4">
-                    <p className="text-xs text-text-secondary font-medium mb-1">
+                    <p className="text-xs text-text-secondary font-semibold mb-1">
                       {product.brand?.name || 'Brand'}
                     </p>
                     <h3 className="font-semibold text-text mb-2 line-clamp-2 group-hover:text-primary transition-colors">
                       {product.name}
                     </h3>
                     <div className="flex items-baseline gap-2">
-                      <span className="text-xl font-bold text-primary">
-                        ₹{product.sellingPrice?.toLocaleString() || '0'}
+                      <span className="price">
+                        ₹{(product.sellingPrice || 0).toLocaleString()}
                       </span>
                     </div>
                   </div>
@@ -306,8 +305,8 @@ export default function ElectronicsHome() {
       </section>
 
       {/* Why Choose Us */}
-      <section className="py-16 lg:py-20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <section className="section">
+        <div className="container">
           <ScrollReveal>
             <div className="text-center mb-12">
               <h2 className="text-3xl lg:text-4xl font-bold text-text mb-4">
@@ -327,7 +326,7 @@ export default function ElectronicsHome() {
               { icon: CreditCard, title: 'Easy EMI', desc: 'Flexible payment options available' },
             ].map((item, idx) => (
               <ScrollReveal key={idx} delay={idx * 0.1}>
-                <div className="bg-surface rounded-xl p-6 text-center hover:shadow-lg transition-all border border-border">
+                <div className="card p-6 text-center">
                   <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
                     <item.icon size={28} className="text-primary" />
                   </div>
@@ -341,8 +340,8 @@ export default function ElectronicsHome() {
       </section>
 
       {/* Store Visit CTA */}
-      <section className="py-16 lg:py-20 bg-primary">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <section className="section gradient-primary">
+        <div className="container">
           <ScrollReveal>
             <div className="text-center">
               <h2 className="text-3xl lg:text-4xl font-bold text-white mb-4">
@@ -354,14 +353,16 @@ export default function ElectronicsHome() {
               <div className="flex flex-wrap justify-center gap-4">
                 <Link
                   to="/contact"
-                  className="inline-flex items-center gap-2 bg-white text-primary px-8 py-4 rounded-lg font-semibold hover:bg-background transition-colors"
+                  className="btn"
+                  style={{ background: 'white', color: 'var(--color-primary)' }}
                 >
                   Get Directions
                   <ChevronRight size={20} />
                 </Link>
                 <a
                   href="tel:+919876543210"
-                  className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm text-white px-8 py-4 rounded-lg font-semibold hover:bg-white/20 transition-colors border border-white/30"
+                  className="btn"
+                  style={{ background: 'rgba(255,255,255,0.1)', color: 'white', border: '2px solid rgba(255,255,255,0.3)' }}
                 >
                   Call Now
                 </a>

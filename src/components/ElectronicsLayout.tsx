@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Menu, X, Search, ShoppingCart, Phone, MapPin, Clock } from 'lucide-react';
+import { Menu, X, Search, ShoppingCart, User, Phone, MapPin, Clock, ChevronDown } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 interface LayoutProps {
@@ -37,21 +37,12 @@ export default function ElectronicsLayout({ children }: LayoutProps) {
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Announcement Bar */}
-      <div className="bg-primary text-white text-center py-2 px-4 text-sm font-medium">
-        <span className="inline-flex items-center gap-2">
-          <span>🎉</span>
-          <span>Special Festival Offers Available Now - Visit Our Showroom!</span>
-          <span>🎉</span>
-        </span>
-      </div>
-
-      {/* Top Info Bar */}
-      <div className="bg-surface border-b border-border hidden md:block">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-10 text-sm text-text-secondary">
+      {/* Top Bar */}
+      <div className="bg-primary text-white text-sm py-2 hidden md:block">
+        <div className="container">
+          <div className="flex items-center justify-between">
             <div className="flex items-center gap-6">
-              <a href="tel:+919876543210" className="flex items-center gap-2 hover:text-primary transition-colors">
+              <a href="tel:+919876543210" className="flex items-center gap-2 hover:text-white/80 transition-colors">
                 <Phone size={14} />
                 <span>+91 98765 43210</span>
               </a>
@@ -65,10 +56,11 @@ export default function ElectronicsLayout({ children }: LayoutProps) {
               </div>
             </div>
             <div className="flex items-center gap-4">
-              <Link to="/contact" className="hover:text-primary transition-colors">
+              <Link to="/contact" className="hover:text-white/80 transition-colors">
                 Store Locator
               </Link>
-              <Link to="/contact" className="hover:text-primary transition-colors">
+              <span className="text-white/30">|</span>
+              <Link to="/contact" className="hover:text-white/80 transition-colors">
                 Support
               </Link>
             </div>
@@ -76,71 +68,82 @@ export default function ElectronicsLayout({ children }: LayoutProps) {
         </div>
       </div>
 
-      {/* Header */}
-      <header
-        className={`sticky top-0 z-50 transition-all duration-300 ${
-          isScrolled ? 'glass shadow-md' : 'bg-surface border-b border-border'
-        }`}
-      >
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      {/* Announcement Bar */}
+      <div className="bg-accent text-white text-center py-2.5 px-4 text-sm font-semibold">
+        <span className="inline-flex items-center gap-2">
+          <span>🎉</span>
+          <span>Special Festival Offers - Up to 40% OFF on Selected Items!</span>
+          <span>🎉</span>
+        </span>
+      </div>
+
+      {/* Main Header */}
+      <header className={`sticky top-0 z-50 transition-all duration-300 ${
+        isScrolled ? 'glass shadow-lg' : 'bg-white border-b border-border'
+      }`}>
+        <div className="container">
           <div className="flex items-center justify-between h-16 lg:h-20">
             {/* Logo */}
-            <Link to="/" className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-primary rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold text-xl">S</span>
+            <Link to="/" className="flex items-center gap-3 flex-shrink-0">
+              <div className="w-10 h-10 lg:w-12 lg:h-12 gradient-primary rounded-lg flex items-center justify-center shadow-lg">
+                <span className="text-white font-bold text-xl lg:text-2xl">S</span>
               </div>
-              <div>
-                <h1 className="text-xl font-bold text-text leading-none">SHIVAM</h1>
-                <p className="text-xs text-text-secondary font-medium">ELECTRONICS</p>
+              <div className="hidden sm:block">
+                <h1 className="text-lg lg:text-xl font-bold text-text leading-none">SHIVAM</h1>
+                <p className="text-xs text-text-secondary font-medium tracking-wider">ELECTRONICS</p>
               </div>
             </Link>
 
-            {/* Desktop Nav */}
-            <nav className="hidden lg:flex items-center gap-8">
+            {/* Desktop Navigation */}
+            <nav className="hidden lg:flex items-center gap-1">
               {navLinks.map((link) => (
                 <Link
                   key={link.to}
                   to={link.to}
-                  className="text-sm font-medium text-text hover:text-primary transition-colors relative group"
+                  className="px-4 py-2 text-sm font-semibold text-text hover:text-primary transition-colors rounded-lg hover:bg-primary/5"
                 >
                   {link.label}
-                  <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary group-hover:w-full transition-all duration-300" />
                 </Link>
               ))}
             </nav>
 
             {/* Right Actions */}
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2">
               {/* Search */}
               <button
                 onClick={() => setIsSearchOpen(!isSearchOpen)}
-                className="p-2 hover:bg-background rounded-lg transition-colors"
+                className="p-2.5 hover:bg-background rounded-lg transition-colors"
                 aria-label="Search"
               >
                 <Search size={20} className="text-text" />
               </button>
 
-              {/* Cart (placeholder) */}
-              <button className="p-2 hover:bg-background rounded-lg transition-colors relative" aria-label="Cart">
+              {/* Cart */}
+              <Link to="/cart" className="p-2.5 hover:bg-background rounded-lg transition-colors relative">
                 <ShoppingCart size={20} className="text-text" />
                 <span className="absolute -top-1 -right-1 w-5 h-5 bg-accent text-white text-xs font-bold rounded-full flex items-center justify-center">
                   0
                 </span>
-              </button>
+              </Link>
 
-              {/* Contact CTA */}
+              {/* Account */}
+              <Link to="/account" className="hidden sm:flex p-2.5 hover:bg-background rounded-lg transition-colors">
+                <User size={20} className="text-text" />
+              </Link>
+
+              {/* CTA Button */}
               <Link
                 to="/contact"
-                className="hidden md:inline-flex items-center gap-2 bg-primary text-white px-5 py-2.5 text-sm font-semibold rounded-lg hover:bg-primary-dark transition-colors"
+                className="hidden md:inline-flex btn btn-primary ml-2"
               >
                 <Phone size={16} />
-                Enquire Now
+                <span>Enquire</span>
               </Link>
 
               {/* Mobile Menu Toggle */}
               <button
                 onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                className="lg:hidden p-2 hover:bg-background rounded-lg transition-colors"
+                className="lg:hidden p-2.5 hover:bg-background rounded-lg transition-colors"
                 aria-label="Toggle menu"
               >
                 {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
@@ -156,10 +159,10 @@ export default function ElectronicsLayout({ children }: LayoutProps) {
               initial={{ opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: 'auto' }}
               exit={{ opacity: 0, height: 0 }}
-              className="border-t border-border bg-surface"
+              className="border-t border-border bg-white"
             >
-              <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-                <div className="relative">
+              <div className="container py-4">
+                <div className="relative max-w-2xl mx-auto">
                   <Search size={20} className="absolute left-4 top-1/2 -translate-y-1/2 text-text-secondary" />
                   <input
                     type="text"
@@ -180,23 +183,24 @@ export default function ElectronicsLayout({ children }: LayoutProps) {
               initial={{ opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: 'auto' }}
               exit={{ opacity: 0, height: 0 }}
-              className="lg:hidden bg-surface border-t border-border"
+              className="lg:hidden bg-white border-t border-border"
             >
-              <nav className="px-4 py-6 space-y-1">
+              <nav className="container py-6 space-y-1">
                 {navLinks.map((link) => (
                   <Link
                     key={link.to}
                     to={link.to}
-                    className="block px-4 py-3 text-text hover:bg-background hover:text-primary rounded-lg transition-colors font-medium"
+                    className="block px-4 py-3 text-text hover:bg-primary/5 hover:text-primary rounded-lg transition-colors font-semibold"
                   >
                     {link.label}
                   </Link>
                 ))}
-                <div className="pt-4 mt-4 border-t border-border">
+                <div className="pt-4 mt-4 border-t border-border space-y-2">
                   <Link
                     to="/contact"
-                    className="block w-full text-center bg-primary text-white px-6 py-3 rounded-lg font-semibold hover:bg-primary-dark transition-colors"
+                    className="block w-full text-center btn btn-primary"
                   >
+                    <Phone size={16} />
                     Enquire Now
                   </Link>
                 </div>
@@ -207,42 +211,42 @@ export default function ElectronicsLayout({ children }: LayoutProps) {
       </header>
 
       {/* Main Content */}
-      <main>{children}</main>
+      <main className="min-h-[60vh]">{children}</main>
 
       {/* Footer */}
       <footer className="bg-text text-white mt-20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+        <div className="container py-16">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12">
             {/* Brand */}
             <div>
               <div className="flex items-center gap-3 mb-6">
-                <div className="w-10 h-10 bg-primary rounded-lg flex items-center justify-center">
-                  <span className="text-white font-bold text-xl">S</span>
+                <div className="w-12 h-12 gradient-primary rounded-lg flex items-center justify-center">
+                  <span className="text-white font-bold text-2xl">S</span>
                 </div>
                 <div>
                   <h3 className="text-xl font-bold leading-none">SHIVAM</h3>
-                  <p className="text-xs text-white/60 font-medium">ELECTRONICS</p>
+                  <p className="text-xs text-white/60 font-medium tracking-wider">ELECTRONICS</p>
                 </div>
               </div>
               <p className="text-white/70 text-sm leading-relaxed mb-6">
                 Your trusted electronics and home appliance showroom. Quality products, great prices, and expert service.
               </p>
-              <div className="flex gap-4">
+              <div className="flex gap-3">
                 <a href="#" className="w-10 h-10 bg-white/10 rounded-lg flex items-center justify-center hover:bg-primary transition-colors">
-                  <span className="text-sm">FB</span>
+                  <span className="text-sm font-semibold">FB</span>
                 </a>
                 <a href="#" className="w-10 h-10 bg-white/10 rounded-lg flex items-center justify-center hover:bg-primary transition-colors">
-                  <span className="text-sm">IG</span>
+                  <span className="text-sm font-semibold">IG</span>
                 </a>
                 <a href="#" className="w-10 h-10 bg-white/10 rounded-lg flex items-center justify-center hover:bg-primary transition-colors">
-                  <span className="text-sm">YT</span>
+                  <span className="text-sm font-semibold">YT</span>
                 </a>
               </div>
             </div>
 
             {/* Quick Links */}
             <div>
-              <h4 className="text-sm font-semibold uppercase tracking-wider mb-6">Quick Links</h4>
+              <h4 className="text-sm font-bold uppercase tracking-wider mb-6">Quick Links</h4>
               <ul className="space-y-3">
                 {navLinks.map((link) => (
                   <li key={link.to}>
@@ -256,7 +260,7 @@ export default function ElectronicsLayout({ children }: LayoutProps) {
 
             {/* Categories */}
             <div>
-              <h4 className="text-sm font-semibold uppercase tracking-wider mb-6">Categories</h4>
+              <h4 className="text-sm font-bold uppercase tracking-wider mb-6">Categories</h4>
               <ul className="space-y-3">
                 <li><Link to="/categories/televisions" className="text-white/70 hover:text-white transition-colors text-sm">Televisions</Link></li>
                 <li><Link to="/categories/smartphones" className="text-white/70 hover:text-white transition-colors text-sm">Smartphones</Link></li>
@@ -268,7 +272,7 @@ export default function ElectronicsLayout({ children }: LayoutProps) {
 
             {/* Contact */}
             <div>
-              <h4 className="text-sm font-semibold uppercase tracking-wider mb-6">Contact Us</h4>
+              <h4 className="text-sm font-bold uppercase tracking-wider mb-6">Contact Us</h4>
               <ul className="space-y-4 text-sm">
                 <li className="flex items-start gap-3">
                   <MapPin size={18} className="text-primary flex-shrink-0 mt-0.5" />
@@ -288,7 +292,7 @@ export default function ElectronicsLayout({ children }: LayoutProps) {
               <div className="mt-6">
                 <Link
                   to="/contact"
-                  className="inline-flex items-center gap-2 bg-primary text-white px-5 py-2.5 text-sm font-semibold rounded-lg hover:bg-primary-dark transition-colors"
+                  className="inline-flex btn btn-primary"
                 >
                   Get Directions
                 </Link>
