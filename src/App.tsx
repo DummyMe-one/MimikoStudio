@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { HashRouter, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './contexts/AuthContext';
 import { ThemeProvider } from './contexts/ThemeContext';
+import { SiteSettingsProvider } from './contexts/SiteSettingsContext';
 import Layout from './components/Layout';
 import BookingModal from './components/BookingModal';
 import HomePage from './pages/Home';
@@ -33,7 +34,8 @@ import HomepageBuilder from './pages/admin/HomepageBuilder';
 import MediaLibrary from './pages/admin/MediaLibrary';
 import UsersManager from './pages/admin/UsersManager';
 import ActivityLog from './pages/admin/ActivityLog';
-import DynamicHome from './pages/DynamicHome';
+import SiteSettingsManager from './pages/admin/SiteSettingsManager';
+import PremiumHome from './pages/PremiumHome';
 
 export default function App() {
   const [isBookingModalOpen, setIsBookingModalOpen] = useState(false);
@@ -47,6 +49,7 @@ export default function App() {
   return (
     <AuthProvider>
       <ThemeProvider>
+        <SiteSettingsProvider>
         <HashRouter>
           <Routes>
         {/* Admin Routes (no Layout wrapper) */}
@@ -64,13 +67,14 @@ export default function App() {
           <Route path="media" element={<MediaLibrary />} />
           <Route path="users" element={<UsersManager />} />
           <Route path="activity" element={<ActivityLog />} />
+          <Route path="settings" element={<SiteSettingsManager />} />
         </Route>
 
         {/* Public Routes */}
         <Route path="*" element={
           <Layout onBookClick={() => openBookingModal()}>
             <Routes>
-              <Route path="/" element={<DynamicHome onBookClick={openBookingModal} />} />
+              <Route path="/" element={<PremiumHome onBookClick={openBookingModal} />} />
               <Route path="/collections" element={<Collections />} />
               <Route path="/collections/:slug" element={<CollectionDetail />} />
               <Route path="/designs/:slug" element={<DesignDetail onBookClick={openBookingModal} />} />
@@ -95,6 +99,7 @@ export default function App() {
             prefillDesign={bookingPrefill}
           />
         </HashRouter>
+        </SiteSettingsProvider>
       </ThemeProvider>
     </AuthProvider>
   );
