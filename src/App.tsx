@@ -31,6 +31,8 @@ import SetupGuide from './pages/admin/SetupGuide';
 import AppearanceStudio from './pages/admin/AppearanceStudio';
 import HomepageBuilder from './pages/admin/HomepageBuilder';
 import MediaLibrary from './pages/admin/MediaLibrary';
+import UsersManager from './pages/admin/UsersManager';
+import ActivityLog from './pages/admin/ActivityLog';
 import DynamicHome from './pages/DynamicHome';
 
 export default function App() {
@@ -60,6 +62,8 @@ export default function App() {
           <Route path="appearance" element={<AppearanceStudio />} />
           <Route path="homepage" element={<HomepageBuilder />} />
           <Route path="media" element={<MediaLibrary />} />
+          <Route path="users" element={<UsersManager />} />
+          <Route path="activity" element={<ActivityLog />} />
         </Route>
 
         {/* Public Routes */}

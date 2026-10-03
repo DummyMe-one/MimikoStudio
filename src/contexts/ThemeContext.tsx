@@ -73,9 +73,25 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     const loadTheme = async () => {
+      // Try loading from localStorage first (works without database)
+      const saved = localStorage.getItem('mimiko_theme');
+      if (saved) {
+        try {
+          const parsed = JSON.parse(saved);
+          setThemeState({ ...defaultTheme, ...parsed });
+          setLoading(false);
+          return;
+        } catch (e) {
+          // Invalid JSON, continue to Supabase
+        }
+      }
+
+      // Try loading from Supabase
       const res = await appearanceApi.get();
       if (res.success && res.data) {
-        setThemeState({ ...defaultTheme, ...res.data });
+        const merged = { ...defaultTheme, ...res.data };
+        setThemeState(merged);
+        localStorage.setItem('mimiko_theme', JSON.stringify(merged));
       }
       setLoading(false);
     };
@@ -128,7 +144,12 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   }, [theme]);
 
   const setTheme = (updates: Partial<ThemeSettings>) => {
-    setThemeState(prev => ({ ...prev, ...updates }));
+    setThemeState(prev => {
+      const newTheme = { ...prev, ...updates };
+      // Save to localStorage for immediate persistence
+      localStorage.setItem('mimiko_theme', JSON.stringify(newTheme));
+      return newTheme;
+    });
   };
 
   return (

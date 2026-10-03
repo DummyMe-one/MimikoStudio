@@ -1,13 +1,14 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation, Outlet } from 'react-router-dom';
-import { LayoutDashboard, Package, FolderOpen, ClipboardList, MessageSquare, LogOut, Menu, X, ExternalLink, Settings, LayoutGrid, Palette, Image } from 'lucide-react';
+import { LayoutDashboard, Package, FolderOpen, ClipboardList, MessageSquare, LogOut, Menu, X, ExternalLink, Settings, LayoutGrid, Palette, Image, Users, Activity } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
+import { PERMISSIONS } from '../../lib/permissions';
 
 export default function AdminLayout() {
   const navigate = useNavigate();
   const location = useLocation();
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const { user, signOut, loading, isConfigured } = useAuth();
+  const { user, signOut, loading, isConfigured, hasPermission, profile } = useAuth();
 
   useEffect(() => {
     if (!loading && !user && isConfigured) {
@@ -20,17 +21,23 @@ export default function AdminLayout() {
     navigate('/admin/login');
   };
 
-  const navItems = [
-    { to: '/admin/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
-    { to: '/admin/designs', icon: Package, label: 'Designs' },
-    { to: '/admin/collections', icon: FolderOpen, label: 'Collections' },
-    { to: '/admin/bookings', icon: ClipboardList, label: 'Bookings' },
-    { to: '/admin/messages', icon: MessageSquare, label: 'Messages' },
-    { to: '/admin/homepage', icon: LayoutGrid, label: 'Homepage Builder' },
-    { to: '/admin/appearance', icon: Palette, label: 'Appearance' },
-    { to: '/admin/media', icon: Image, label: 'Media Library' },
-    { to: '/admin/setup', icon: Settings, label: 'Setup Guide' },
+  // Define all nav items with their required permissions
+  const allNavItems = [
+    { to: '/admin/dashboard', icon: LayoutDashboard, label: 'Dashboard', permission: PERMISSIONS.DASHBOARD_VIEW },
+    { to: '/admin/designs', icon: Package, label: 'Designs', permission: PERMISSIONS.DESIGNS_VIEW },
+    { to: '/admin/collections', icon: FolderOpen, label: 'Collections', permission: PERMISSIONS.COLLECTIONS_VIEW },
+    { to: '/admin/bookings', icon: ClipboardList, label: 'Bookings', permission: PERMISSIONS.BOOKINGS_VIEW },
+    { to: '/admin/messages', icon: MessageSquare, label: 'Messages', permission: PERMISSIONS.DASHBOARD_VIEW },
+    { to: '/admin/homepage', icon: LayoutGrid, label: 'Homepage Builder', permission: PERMISSIONS.HOMEPAGE_VIEW },
+    { to: '/admin/appearance', icon: Palette, label: 'Appearance', permission: PERMISSIONS.APPEARANCE_VIEW },
+    { to: '/admin/media', icon: Image, label: 'Media Library', permission: PERMISSIONS.MEDIA_VIEW },
+    { to: '/admin/users', icon: Users, label: 'Users', permission: PERMISSIONS.USERS_VIEW },
+    { to: '/admin/activity', icon: Activity, label: 'Activity Log', permission: PERMISSIONS.AUDIT_VIEW },
+    { to: '/admin/setup', icon: Settings, label: 'Setup Guide', permission: PERMISSIONS.DASHBOARD_VIEW },
   ];
+
+  // Filter nav items based on user permissions
+  const navItems = allNavItems.filter(item => hasPermission(item.permission));
 
   return (
     <div className="min-h-screen bg-cream/30 flex">
@@ -64,6 +71,12 @@ export default function AdminLayout() {
         </nav>
 
         <div className="p-4 border-t border-ivory/10 space-y-2">
+          {profile && (
+            <div className="px-4 py-2 mb-2">
+              <p className="text-xs text-ivory/80 font-medium truncate">{profile.name || profile.email}</p>
+              <p className="text-[10px] text-light-gold uppercase tracking-wider">{profile.role?.replace('_', ' ')}</p>
+            </div>
+          )}
           <Link
             to="/"
             target="_blank"

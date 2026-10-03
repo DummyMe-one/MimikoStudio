@@ -31,13 +31,20 @@ export default function AppearanceStudio() {
 
   const handleSave = async () => {
     setSaving(true);
+    // Always save to localStorage first (works without database)
+    localStorage.setItem('mimiko_theme', JSON.stringify(localTheme));
+    
+    // Try to save to Supabase (optional enhancement)
     const res = await appearanceApi.update(localTheme);
     setSaving(false);
+    
     if (res.success) {
       setSaved(true);
       setTimeout(() => setSaved(false), 2000);
     } else {
-      alert(res.error || 'Failed to save');
+      // Even if Supabase fails, localStorage save worked
+      setSaved(true);
+      setTimeout(() => setSaved(false), 2000);
     }
   };
 
@@ -47,14 +54,47 @@ export default function AppearanceStudio() {
     if (res.success && res.data) {
       setLocalTheme(res.data);
       setTheme(res.data);
+      localStorage.setItem('mimiko_theme', JSON.stringify(res.data));
+    } else {
+      // Reset to default theme locally
+      const defaultTheme = {
+        primary_color: '#C6A15B',
+        secondary_color: '#EFE6D6',
+        accent_color: '#C6A15B',
+        background_color: '#F8F4EC',
+        surface_color: '#FFFFFF',
+        dark_background: '#241C17',
+        text_color: '#302821',
+        muted_text_color: '#75695C',
+        border_color: '#E8D5B5',
+        heading_font: 'Cormorant Garamond',
+        body_font: 'Inter',
+        heading_weight: 600,
+        body_weight: 400,
+        heading_size_multiplier: 1.0,
+        border_radius: 4,
+        card_radius: 8,
+        button_radius: 4,
+        image_style: 'rounded',
+        shadow_intensity: 'subtle',
+        animation_intensity: 'elegant',
+        section_spacing: 'comfortable',
+        header_style: 'luxury',
+        header_transparent: false,
+      };
+      setLocalTheme(defaultTheme);
+      setTheme(defaultTheme);
+      localStorage.setItem('mimiko_theme', JSON.stringify(defaultTheme));
     }
   };
 
   const applyPreset = async (presetId: string) => {
     const res = await appearanceApi.applyPreset(presetId);
     if (res.success && res.data) {
-      setLocalTheme(prev => ({ ...prev, ...res.data }));
-      setTheme(res.data);
+      const newTheme = { ...localTheme, ...res.data };
+      setLocalTheme(newTheme);
+      setTheme(newTheme);
+      localStorage.setItem('mimiko_theme', JSON.stringify(newTheme));
     }
   };
 
