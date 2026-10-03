@@ -2,7 +2,7 @@ import { Link, useParams } from 'react-router-dom';
 import { ArrowLeft, ArrowRight } from 'lucide-react';
 import ImageGallery from '../components/ImageGallery';
 import ScrollReveal from '../components/ScrollReveal';
-import { designs, collections } from '../data';
+import { useDesign, useDesigns, useCollections } from '../hooks/useData';
 
 interface DesignDetailProps {
   onBookClick: (design?: { id: string; name: string; collection: string }) => void;
@@ -10,9 +10,19 @@ interface DesignDetailProps {
 
 export default function DesignDetail({ onBookClick }: DesignDetailProps) {
   const { slug } = useParams<{ slug: string }>();
-  const design = designs.find((d) => d.slug === slug);
+  const { design, loading, notFound } = useDesign(slug);
+  const { designs } = useDesigns();
+  const { collections } = useCollections();
 
-  if (!design) {
+  if (loading) {
+    return (
+      <div className="py-24 text-center max-w-7xl mx-auto px-4">
+        <p className="text-taupe">Loading design...</p>
+      </div>
+    );
+  }
+
+  if (notFound || !design) {
     return (
       <div className="py-24 text-center max-w-7xl mx-auto px-4">
         <h1 className="heading-serif text-3xl text-espresso mb-4">Design Not Found</h1>

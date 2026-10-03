@@ -1,13 +1,16 @@
 import { Link } from 'react-router-dom';
 import { ArrowRight, Sparkles, Palette, Heart, Star } from 'lucide-react';
 import ScrollReveal from '../components/ScrollReveal';
-import { collections, designs } from '../data';
+import { useDesigns, useCollections } from '../hooks/useData';
 
 interface HomePageProps {
   onBookClick: () => void;
 }
 
 export default function HomePage({ onBookClick }: HomePageProps) {
+  const { designs } = useDesigns();
+  const { collections } = useCollections();
+  
   const featuredCollections = collections.filter((c) => c.featured).slice(0, 5);
   const featuredDesigns = designs.filter((d) => d.featured).slice(0, 6);
 

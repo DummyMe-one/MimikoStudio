@@ -1,10 +1,13 @@
 import { useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import { collections, designs } from '../data';
 import ScrollReveal from '../components/ScrollReveal';
+import { useDesigns, useCollections } from '../hooks/useData';
 
 export default function CollectionDetail() {
   const { slug } = useParams<{ slug: string }>();
+  const { collections } = useCollections();
+  const { designs } = useDesigns();
+  
   const collection = collections.find((c) => c.slug === slug);
   const [filter, setFilter] = useState('all');
 

@@ -1,9 +1,10 @@
 import { Link } from 'react-router-dom';
 import { ArrowRight } from 'lucide-react';
 import ScrollReveal from '../components/ScrollReveal';
-import { collections } from '../data';
+import { useCollections } from '../hooks/useData';
 
 export default function Collections() {
+  const { collections } = useCollections();
   return (
     <div>
       {/* Header */}

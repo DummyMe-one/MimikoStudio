@@ -1,14 +1,15 @@
 import { Link } from 'react-router-dom';
 import { ArrowRight } from 'lucide-react';
 import ScrollReveal from '../components/ScrollReveal';
-import { designs } from '../data';
+import { useDesigns } from '../hooks/useData';
 
 interface NavratriPageProps {
   onBookClick: () => void;
 }
 
 export default function NavratriPage({ onBookClick }: NavratriPageProps) {
-  const navratriDesigns = designs.filter((d) => d.collectionId === 'navratri');
+  const { designs } = useDesigns();
+  const navratriDesigns = designs.filter((d) => (d.collectionId === 'navratri') || (d as any).collection_id === 'navratri');
 
   return (
     <div>

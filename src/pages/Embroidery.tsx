@@ -1,10 +1,11 @@
 import { Link } from 'react-router-dom';
 import { ArrowRight } from 'lucide-react';
 import ScrollReveal from '../components/ScrollReveal';
-import { designs } from '../data';
+import { useDesigns } from '../hooks/useData';
 
 export default function Embroidery() {
-  const embroideryDesigns = designs.filter((d) => d.collectionId === 'embroidery');
+  const { designs } = useDesigns();
+  const embroideryDesigns = designs.filter((d) => (d.collectionId === 'embroidery') || (d as any).collection_id === 'embroidery');
 
   return (
     <div>

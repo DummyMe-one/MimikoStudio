@@ -1,9 +1,10 @@
 import { Link } from 'react-router-dom';
 import { Instagram } from 'lucide-react';
 import ScrollReveal from '../components/ScrollReveal';
-import { designs } from '../data';
+import { useDesigns } from '../hooks/useData';
 
 export default function Gallery() {
+  const { designs } = useDesigns();
   // Collect all images from designs for the gallery
   const allImages = designs.flatMap((d) =>
     d.images.map((img) => ({ ...img, designName: d.name, designSlug: d.slug }))
