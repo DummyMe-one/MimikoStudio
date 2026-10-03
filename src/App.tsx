@@ -26,6 +26,7 @@ import DesignsManager from './pages/admin/DesignsManager';
 import CollectionsManager from './pages/admin/CollectionsManager';
 import BookingsManager from './pages/admin/BookingsManager';
 import MessagesManager from './pages/admin/MessagesManager';
+import SetupGuide from './pages/admin/SetupGuide';
 
 export default function App() {
   const [isBookingModalOpen, setIsBookingModalOpen] = useState(false);
@@ -43,12 +44,13 @@ export default function App() {
         {/* Admin Routes (no Layout wrapper) */}
         <Route path="/admin/login" element={<AdminLogin />} />
         <Route path="/admin" element={<AdminLayout />}>
-          <Route index element={<Dashboard />} />
+          <Route index element={<SetupGuide />} />
           <Route path="dashboard" element={<Dashboard />} />
           <Route path="designs" element={<DesignsManager />} />
           <Route path="collections" element={<CollectionsManager />} />
           <Route path="bookings" element={<BookingsManager />} />
           <Route path="messages" element={<MessagesManager />} />
+          <Route path="setup" element={<SetupGuide />} />
         </Route>
 
         {/* Public Routes */}

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation, Outlet } from 'react-router-dom';
-import { LayoutDashboard, Package, FolderOpen, ClipboardList, MessageSquare, LogOut, Menu, X, ExternalLink } from 'lucide-react';
+import { LayoutDashboard, Package, FolderOpen, ClipboardList, MessageSquare, LogOut, Menu, X, ExternalLink, Settings } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 
 export default function AdminLayout() {
@@ -26,6 +26,7 @@ export default function AdminLayout() {
     { to: '/admin/collections', icon: FolderOpen, label: 'Collections' },
     { to: '/admin/bookings', icon: ClipboardList, label: 'Bookings' },
     { to: '/admin/messages', icon: MessageSquare, label: 'Messages' },
+    { to: '/admin/setup', icon: Settings, label: 'Setup Guide' },
   ];
 
   return (

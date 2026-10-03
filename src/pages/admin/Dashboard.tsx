@@ -1,7 +1,9 @@
 import { useState, useEffect } from 'react';
-import { Package, FolderOpen, ClipboardList, MessageSquare, TrendingUp } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { Package, FolderOpen, ClipboardList, MessageSquare, TrendingUp, AlertCircle } from 'lucide-react';
 import { designsApi, collectionsApi, bookingsApi, contactApi } from '../../services/api';
 import { designs as localDesigns, collections as localCollections } from '../../data';
+import { isSupabaseConfigured } from '../../lib/supabase';
 
 export default function Dashboard() {
   const [stats, setStats] = useState({
@@ -68,6 +70,20 @@ export default function Dashboard() {
         <h1 className="heading-serif text-3xl font-semibold text-espresso mb-1">Dashboard</h1>
         <p className="text-taupe text-sm">Welcome back to Mimiko Studio admin panel</p>
       </div>
+
+      {!isSupabaseConfigured() && (
+        <div className="mb-6 p-4 bg-amber-50 border border-amber-200 flex items-start gap-3">
+          <AlertCircle size={20} className="text-amber-600 flex-shrink-0 mt-0.5" />
+          <div>
+            <p className="text-sm font-medium text-amber-800">Setup Required</p>
+            <p className="text-xs text-amber-700 mt-1">
+              Supabase is not configured. Please complete the{' '}
+              <Link to="/admin/setup" className="underline font-medium">setup guide</Link>{' '}
+              to enable full functionality.
+            </p>
+          </div>
+        </div>
+      )}
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
         {statCards.map((stat, idx) => (
