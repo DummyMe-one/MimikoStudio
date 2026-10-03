@@ -1,5 +1,8 @@
 import { useParams, Link } from 'react-router-dom';
 import { useCategories, useProducts } from '../hooks/useElectronicsData';
+import ProductCard from '../components/ProductCard';
+import ScrollReveal from '../components/ScrollReveal';
+import { ChevronRight } from 'lucide-react';
 
 export default function CategoryDetail() {
   const { slug } = useParams<{ slug: string }>();
@@ -22,25 +25,57 @@ export default function CategoryDetail() {
 
   return (
     <div className="bg-background min-h-screen">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="mb-8">
-          <h1 className="text-3xl lg:text-4xl font-bold text-text mb-2">{category.name}</h1>
-          {category.description && <p className="text-text-secondary">{category.description}</p>}
+      <div className="container py-8">
+        {/* Breadcrumb */}
+        <nav className="flex items-center gap-2 text-sm text-text-secondary mb-8">
+          <Link to="/" className="hover:text-primary transition-colors">Home</Link>
+          <ChevronRight size={16} />
+          <Link to="/categories" className="hover:text-primary transition-colors">Categories</Link>
+          <ChevronRight size={16} />
+          <span className="text-text font-semibold">{category.name}</span>
+        </nav>
+
+        {/* Category Header */}
+        <div className="bg-white rounded-xl p-6 lg:p-8 mb-8 border border-border">
+          <div className="flex items-start gap-6">
+            {category.imageUrl && (
+              <div className="w-24 h-24 rounded-xl overflow-hidden flex-shrink-0">
+                <img src={category.imageUrl} alt={category.name} className="w-full h-full object-cover" />
+              </div>
+            )}
+            <div>
+              <h1 className="text-3xl lg:text-4xl font-bold text-text mb-2">{category.name}</h1>
+              {category.description && (
+                <p className="text-text-secondary text-lg">{category.description}</p>
+              )}
+            </div>
+          </div>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {categoryProducts.map(product => (
-            <Link key={product.id} to={`/products/${product.slug}`} className="group block bg-surface rounded-xl overflow-hidden hover:shadow-xl transition-all border border-border">
-              <div className="aspect-square bg-background relative overflow-hidden">
-                <img src={product.images?.[0]?.imageUrl || 'https://images.unsplash.com/photo-1593642632823-8f785ba67e45?w=400&q=80'} alt={product.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
-              </div>
-              <div className="p-4">
-                <h3 className="font-semibold text-text mb-2 line-clamp-2 group-hover:text-primary transition-colors">{product.name}</h3>
-                <span className="text-xl font-bold text-primary">₹{(product.sellingPrice || 0).toLocaleString()}</span>
-              </div>
-            </Link>
-          ))}
+        {/* Products Count */}
+        <div className="mb-6">
+          <p className="text-text-secondary">
+            Showing <span className="font-semibold text-text">{categoryProducts.length}</span> products
+          </p>
         </div>
+
+        {/* Products Grid */}
+        {categoryProducts.length === 0 ? (
+          <div className="text-center py-12 bg-white rounded-xl border border-border">
+            <p className="text-text-secondary text-lg">No products in this category yet</p>
+            <Link to="/products" className="text-primary hover:underline mt-2 inline-block">
+              Browse all products
+            </Link>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            {categoryProducts.map((product, idx) => (
+              <ScrollReveal key={product.id} delay={idx * 0.05}>
+                <ProductCard product={product} />
+              </ScrollReveal>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );
