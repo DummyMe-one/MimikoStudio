@@ -17,6 +17,15 @@ import FAQ from './pages/FAQ';
 import { Privacy, Terms } from './pages/StaticPages';
 import NotFound from './pages/NotFound';
 
+// Admin pages
+import AdminLogin from './pages/admin/Login';
+import AdminLayout from './pages/admin/AdminLayout';
+import Dashboard from './pages/admin/Dashboard';
+import DesignsManager from './pages/admin/DesignsManager';
+import CollectionsManager from './pages/admin/CollectionsManager';
+import BookingsManager from './pages/admin/BookingsManager';
+import MessagesManager from './pages/admin/MessagesManager';
+
 export default function App() {
   const [isBookingModalOpen, setIsBookingModalOpen] = useState(false);
   const [bookingPrefill, setBookingPrefill] = useState<{ id: string; name: string; collection: string } | undefined>();
@@ -28,25 +37,41 @@ export default function App() {
 
   return (
     <HashRouter>
-      <Layout onBookClick={() => openBookingModal()}>
-        <Routes>
-          <Route path="/" element={<HomePage onBookClick={openBookingModal} />} />
-          <Route path="/collections" element={<Collections />} />
-          <Route path="/collections/:slug" element={<CollectionDetail />} />
-          <Route path="/designs/:slug" element={<DesignDetail onBookClick={openBookingModal} />} />
-          <Route path="/about" element={<About />} />
-          <Route path="/embroidery" element={<Embroidery />} />
-          <Route path="/navratri" element={<NavratriPage onBookClick={openBookingModal} />} />
-          <Route path="/custom-design" element={<CustomDesign />} />
-          <Route path="/booking" element={<Booking />} />
-          <Route path="/contact" element={<Contact onBookClick={openBookingModal} />} />
-          <Route path="/gallery" element={<Gallery />} />
-          <Route path="/faq" element={<FAQ />} />
-          <Route path="/privacy" element={<Privacy />} />
-          <Route path="/terms" element={<Terms />} />
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </Layout>
+      <Routes>
+        {/* Admin Routes (no Layout wrapper) */}
+        <Route path="/admin/login" element={<AdminLogin />} />
+        <Route path="/admin" element={<AdminLayout />}>
+          <Route index element={<Dashboard />} />
+          <Route path="dashboard" element={<Dashboard />} />
+          <Route path="designs" element={<DesignsManager />} />
+          <Route path="collections" element={<CollectionsManager />} />
+          <Route path="bookings" element={<BookingsManager />} />
+          <Route path="messages" element={<MessagesManager />} />
+        </Route>
+
+        {/* Public Routes */}
+        <Route path="*" element={
+          <Layout onBookClick={() => openBookingModal()}>
+            <Routes>
+              <Route path="/" element={<HomePage onBookClick={openBookingModal} />} />
+              <Route path="/collections" element={<Collections />} />
+              <Route path="/collections/:slug" element={<CollectionDetail />} />
+              <Route path="/designs/:slug" element={<DesignDetail onBookClick={openBookingModal} />} />
+              <Route path="/about" element={<About />} />
+              <Route path="/embroidery" element={<Embroidery />} />
+              <Route path="/navratri" element={<NavratriPage onBookClick={openBookingModal} />} />
+              <Route path="/custom-design" element={<CustomDesign />} />
+              <Route path="/booking" element={<Booking />} />
+              <Route path="/contact" element={<Contact onBookClick={openBookingModal} />} />
+              <Route path="/gallery" element={<Gallery />} />
+              <Route path="/faq" element={<FAQ />} />
+              <Route path="/privacy" element={<Privacy />} />
+              <Route path="/terms" element={<Terms />} />
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </Layout>
+        } />
+      </Routes>
       <BookingModal
         isOpen={isBookingModalOpen}
         onClose={() => setIsBookingModalOpen(false)}
