@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Menu, X, ShoppingBag } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useSiteSettings } from '../contexts/SiteSettingsContext';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -12,6 +13,7 @@ export default function Layout({ children, onBookClick }: LayoutProps) {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const location = useLocation();
+  const { settings } = useSiteSettings();
 
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 50);
@@ -59,14 +61,18 @@ export default function Layout({ children, onBookClick }: LayoutProps) {
           <div className="flex items-center justify-between h-16 lg:h-24">
             {/* Logo */}
             <Link to="/" className="flex items-center group">
-              <div className="flex flex-col">
-                <span className="heading-serif text-2xl lg:text-[1.75rem] font-semibold text-espresso tracking-wide leading-none">
-                  MIMIKO
-                </span>
-                <span className="text-[9px] tracking-[0.3em] text-muted-gold font-sans font-medium mt-0.5">
-                  ATELIER
-                </span>
-              </div>
+              {settings.logoUrl ? (
+                <img src={settings.logoUrl} alt={settings.siteName} className="h-12 lg:h-16 object-contain" />
+              ) : (
+                <div className="flex flex-col">
+                  <span className="heading-serif text-2xl lg:text-[1.75rem] font-semibold text-espresso tracking-wide leading-none">
+                    MIMIKO
+                  </span>
+                  <span className="text-[9px] tracking-[0.3em] text-muted-gold font-sans font-medium mt-0.5">
+                    ATELIER
+                  </span>
+                </div>
+              )}
             </Link>
 
             {/* Desktop Nav */}
@@ -147,12 +153,22 @@ export default function Layout({ children, onBookClick }: LayoutProps) {
             {/* Brand */}
             <div className="lg:col-span-1">
               <div className="mb-6">
-                <h3 className="heading-serif text-3xl font-semibold text-ivory leading-none">
-                  MIMIKO
-                </h3>
-                <p className="text-[10px] tracking-[0.3em] text-light-gold font-sans font-medium mt-1">
-                  ATELIER
-                </p>
+                {(settings.logoDarkUrl || settings.logoUrl) ? (
+                  <img 
+                    src={settings.logoDarkUrl || settings.logoUrl} 
+                    alt={settings.siteName} 
+                    className="h-16 object-contain" 
+                  />
+                ) : (
+                  <>
+                    <h3 className="heading-serif text-3xl font-semibold text-ivory leading-none">
+                      MIMIKO
+                    </h3>
+                    <p className="text-[10px] tracking-[0.3em] text-light-gold font-sans font-medium mt-1">
+                      ATELIER
+                    </p>
+                  </>
+                )}
               </div>
               <p className="text-sm leading-relaxed text-ivory/60 mb-4">
                 Jewellery • Ornaments • Embroidery • Custom Designs
@@ -161,7 +177,7 @@ export default function Layout({ children, onBookClick }: LayoutProps) {
                 <div className="w-12 h-px bg-gradient-to-r from-light-gold/50 to-transparent"></div>
               </div>
               <p className="text-sm italic text-ivory/50 heading-serif">
-                "Crafted to Adorn. Designed to Remember."
+                "{settings.siteTagline}"
               </p>
             </div>
 

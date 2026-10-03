@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation, Outlet } from 'react-router-dom';
-import { LayoutDashboard, Package, FolderOpen, ClipboardList, MessageSquare, LogOut, Menu, X, ExternalLink, Settings, LayoutGrid, Palette, Image, Users, Activity } from 'lucide-react';
+import { LayoutDashboard, Package, FolderOpen, ClipboardList, MessageSquare, LogOut, Menu, X, ExternalLink, Settings, LayoutGrid, Palette, FileImage, Users, Activity, Globe } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { PERMISSIONS } from '../../lib/permissions';
 
@@ -30,14 +30,18 @@ export default function AdminLayout() {
     { to: '/admin/messages', icon: MessageSquare, label: 'Messages', permission: PERMISSIONS.DASHBOARD_VIEW },
     { to: '/admin/homepage', icon: LayoutGrid, label: 'Homepage Builder', permission: PERMISSIONS.HOMEPAGE_VIEW },
     { to: '/admin/appearance', icon: Palette, label: 'Appearance', permission: PERMISSIONS.APPEARANCE_VIEW },
-    { to: '/admin/media', icon: Image, label: 'Media Library', permission: PERMISSIONS.MEDIA_VIEW },
+    { to: '/admin/media', icon: FileImage, label: 'Media Library', permission: PERMISSIONS.MEDIA_VIEW },
     { to: '/admin/users', icon: Users, label: 'Users', permission: PERMISSIONS.USERS_VIEW },
     { to: '/admin/activity', icon: Activity, label: 'Activity Log', permission: PERMISSIONS.AUDIT_VIEW },
+    { to: '/admin/settings', icon: Globe, label: 'Site Settings', permission: PERMISSIONS.DASHBOARD_VIEW },
     { to: '/admin/setup', icon: Settings, label: 'Setup Guide', permission: PERMISSIONS.DASHBOARD_VIEW },
   ];
 
   // Filter nav items based on user permissions
-  const navItems = allNavItems.filter(item => hasPermission(item.permission));
+  // If no permissions loaded (RBAC tables don't exist), show all items
+  const navItems = profile?.permissions?.length 
+    ? allNavItems.filter(item => hasPermission(item.permission))
+    : allNavItems; // Show all if no permissions system
 
   return (
     <div className="min-h-screen bg-cream/30 flex">
