@@ -25,13 +25,40 @@ export default function Booking() {
     setError('');
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!formData.customerName || !formData.email || !formData.phone) {
       setError('Please fill in all required fields.');
       return;
     }
-    setSubmitted(true);
+    const { bookingsApi, designs: designsData, collections: collectionsData } = await import('../services/api').then(async (api) => {
+      const designsRes = await api.designsApi.getAll();
+      const collectionsRes = await api.collectionsApi.getAll();
+      return {
+        bookingsApi: api.bookingsApi,
+        designs: designsRes.data || [],
+        collections: collectionsRes.data || [],
+      };
+    });
+    const selectedDesign = designsData.find((d: any) => d.id === formData.designId);
+    const collection = collectionsData.find((c: any) => c.id === selectedDesign?.collectionId);
+    const res = await bookingsApi.create({
+      customerName: formData.customerName,
+      email: formData.email,
+      phone: formData.phone,
+      designId: formData.designId,
+      designName: selectedDesign?.name,
+      collection: collection?.name,
+      occasion: formData.occasion,
+      requestedDate: formData.requestedDate,
+      quantity: formData.quantity,
+      customization: formData.customization,
+      colorPreference: formData.colorPreference,
+      sizeDetails: formData.sizeDetails,
+      notes: formData.notes,
+    });
+    if (res.success) setSubmitted(true);
+    else setError(res.error || 'Failed to submit');
   };
 
   return (
