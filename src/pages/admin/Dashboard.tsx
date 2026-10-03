@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Package, FolderOpen, ClipboardList, MessageSquare, TrendingUp, AlertCircle } from 'lucide-react';
 import { designsApi, collectionsApi, bookingsApi, contactApi } from '../../services/api';
-import { designs as localDesigns, collections as localCollections } from '../../data';
 import { isSupabaseConfigured } from '../../lib/supabase';
 
 export default function Dashboard() {
@@ -27,10 +26,10 @@ export default function Dashboard() {
         contactApi.getAll(),
       ]);
 
-      const designsData = designsRes.success ? designsRes.data! : localDesigns;
-      const collectionsData = collectionsRes.success ? collectionsRes.data! : localCollections;
-      const bookingsData = bookingsRes.success ? bookingsRes.data! : [];
-      const messagesData = messagesRes.success ? messagesRes.data! : [];
+      const designsData = designsRes.success && designsRes.data ? designsRes.data : [];
+      const collectionsData = collectionsRes.success && collectionsRes.data ? collectionsRes.data : [];
+      const bookingsData = bookingsRes.success && bookingsRes.data ? bookingsRes.data : [];
+      const messagesData = messagesRes.success && messagesRes.data ? messagesRes.data : [];
 
       setStats({
         designs: designsData.length,
@@ -42,8 +41,8 @@ export default function Dashboard() {
       setRecentBookings(bookingsData.slice(0, 5));
     } catch (err) {
       setStats({
-        designs: localDesigns.length,
-        collections: localCollections.length,
+        designs: 0,
+        collections: 0,
         bookings: 0,
         messages: 0,
         newBookings: 0,

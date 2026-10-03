@@ -1,9 +1,10 @@
 import { Link } from 'react-router-dom';
 import { ArrowRight } from 'lucide-react';
 import ScrollReveal from '../components/ScrollReveal';
-import { collections } from '../data';
+import { useCollections } from '../hooks/useData';
 
 export default function Collections() {
+  const { collections, loading } = useCollections();
   return (
     <div>
       {/* Header */}
@@ -26,8 +27,18 @@ export default function Collections() {
       {/* Collections Grid */}
       <section className="py-16 lg:py-24">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="space-y-12 lg:space-y-20">
-            {collections.map((col, idx) => (
+          {loading ? (
+            <div className="text-center py-12">
+              <p className="text-taupe">Loading collections...</p>
+            </div>
+          ) : collections.length === 0 ? (
+            <div className="text-center py-12">
+              <p className="text-taupe mb-2">No collections available yet.</p>
+              <p className="text-sm text-taupe/70">Collections will appear here once added by the admin.</p>
+            </div>
+          ) : (
+            <div className="space-y-12 lg:space-y-20">
+              {collections.map((col, idx) => (
               <ScrollReveal key={col.id} delay={idx * 0.05}>
                 <Link
                   to={`/collections/${col.slug}`}
@@ -58,7 +69,8 @@ export default function Collections() {
                 </Link>
               </ScrollReveal>
             ))}
-          </div>
+            </div>
+          )}
         </div>
       </section>
     </div>

@@ -1,9 +1,10 @@
 import { Link } from 'react-router-dom';
 import { Instagram } from 'lucide-react';
 import ScrollReveal from '../components/ScrollReveal';
-import { designs } from '../data';
+import { useDesigns } from '../hooks/useData';
 
 export default function Gallery() {
+  const { designs, loading } = useDesigns();
   // Collect all images from designs for the gallery
   const allImages = designs.flatMap((d) =>
     d.images.map((img) => ({ ...img, designName: d.name, designSlug: d.slug }))
@@ -31,8 +32,18 @@ export default function Gallery() {
       {/* Gallery Grid */}
       <section className="py-12 lg:py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="masonry-grid">
-            {allImages.map((img, idx) => (
+          {loading ? (
+            <div className="text-center py-12">
+              <p className="text-taupe">Loading gallery...</p>
+            </div>
+          ) : allImages.length === 0 ? (
+            <div className="text-center py-12">
+              <p className="text-taupe mb-2">No images available yet.</p>
+              <p className="text-sm text-taupe/70">Gallery images will appear here once designs are added by the admin.</p>
+            </div>
+          ) : (
+            <div className="masonry-grid">
+              {allImages.map((img, idx) => (
               <ScrollReveal key={img.id} delay={idx * 0.03}>
                 <Link
                   to={`/designs/${img.designSlug}`}
@@ -53,7 +64,8 @@ export default function Gallery() {
                 </Link>
               </ScrollReveal>
             ))}
-          </div>
+            </div>
+          )}
         </div>
       </section>
 
