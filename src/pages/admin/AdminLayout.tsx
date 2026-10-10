@@ -24,10 +24,10 @@ export default function AdminLayout() {
   // Define all nav items with their required permissions
   const allNavItems = [
     { to: '/admin/dashboard', icon: LayoutDashboard, label: 'Dashboard', permission: PERMISSIONS.DASHBOARD_VIEW },
-    { to: '/admin/designs', icon: Package, label: 'Designs', permission: PERMISSIONS.DESIGNS_VIEW },
-    { to: '/admin/collections', icon: FolderOpen, label: 'Collections', permission: PERMISSIONS.COLLECTIONS_VIEW },
-    { to: '/admin/bookings', icon: ClipboardList, label: 'Bookings', permission: PERMISSIONS.BOOKINGS_VIEW },
-    { to: '/admin/messages', icon: MessageSquare, label: 'Messages', permission: PERMISSIONS.DASHBOARD_VIEW },
+    { to: '/admin/products', icon: Package, label: 'Products', permission: PERMISSIONS.DESIGNS_VIEW },
+    { to: '/admin/categories', icon: FolderOpen, label: 'Categories', permission: PERMISSIONS.COLLECTIONS_VIEW },
+    { to: '/admin/brands', icon: LayoutGrid, label: 'Brands', permission: PERMISSIONS.DASHBOARD_VIEW },
+    { to: '/admin/enquiries', icon: MessageSquare, label: 'Enquiries', permission: PERMISSIONS.BOOKINGS_VIEW },
     { to: '/admin/homepage', icon: LayoutGrid, label: 'Homepage Builder', permission: PERMISSIONS.HOMEPAGE_VIEW },
     { to: '/admin/appearance', icon: Palette, label: 'Appearance', permission: PERMISSIONS.APPEARANCE_VIEW },
     { to: '/admin/media', icon: FileImage, label: 'Media Library', permission: PERMISSIONS.MEDIA_VIEW },
@@ -49,7 +49,7 @@ export default function AdminLayout() {
       <aside className="hidden lg:flex lg:flex-col w-64 bg-espresso text-ivory fixed h-full">
         <div className="p-6 border-b border-ivory/10">
           <h1 className="heading-serif text-xl font-semibold">
-            MIMIKO <span className="text-light-gold">STUDIO</span>
+            SHIVAM <span className="text-light-gold">ELECTRONICS</span>
           </h1>
           <p className="text-xs text-ivory/50 mt-1">Admin Panel</p>
         </div>
@@ -106,7 +106,7 @@ export default function AdminLayout() {
           <aside className="relative w-64 h-full bg-espresso text-ivory">
             <div className="p-6 border-b border-ivory/10 flex items-center justify-between">
               <h1 className="heading-serif text-lg font-semibold">
-                MIMIKO <span className="text-light-gold">STUDIO</span>
+                SHIVAM <span className="text-light-gold">ELECTRONICS</span>
               </h1>
               <button onClick={() => setSidebarOpen(false)}>
                 <X size={20} />
